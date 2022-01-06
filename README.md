@@ -1,2 +1,3 @@
 # rosie-demo
-My Demo
+
+This is my demo project using Go and Ably Realtime.
