@@ -1,4 +1,3 @@
-
 package main
 
 import (
@@ -6,50 +5,86 @@ import (
 	"image"
 	_ "image/jpeg"
 	"log"
-	"math"
 
 	"github.com/hajimehoshi/ebiten/v2"
+	"github.com/hajimehoshi/ebiten/v2/ebitenutil"
 	"github.com/hajimehoshi/ebiten/v2/examples/resources/images"
-)
 
+	"github.com/ably-labs/rosie-demo/button"
+	colour "github.com/ably-labs/rosie-demo/colours"
+	"github.com/ably-labs/rosie-demo/config"
+)
 
 var (
 	gophersImage *ebiten.Image
 )
 
-type Game struct {
+type App struct {
 	count int
 }
 
 //Update updates the logical state.
-func (g *Game) Update() error {
-	g.count++
-	
+func (a *App) Update() error {
+
+	a.count++
+
 	return nil
 }
 
 //Draw renders the screen.
-func (g *Game) Draw(screen *ebiten.Image) {
-	w, h := gophersImage.Size()
-	op := &ebiten.DrawImageOptions{}
+func (a *App) Draw(screen *ebiten.Image) {
 
-	// Move the image's center to the screen's upper-left corner.
-	// This is a preparation for rotating. When geometry matrices are applied,
-	// the origin point is the upper-left corner.
-	op.GeoM.Translate(-float64(w)/2, -float64(h)/2)
+	//w, h := gophersImage.Size()
+	//op := &ebiten.DrawImageOptions{}
+	//op.GeoM.Translate(-float64(w)/2, -float64(h)/2)
+	//op.GeoM.Rotate(float64(a.count%360) * 2 * math.Pi / 360)
+	//op.GeoM.Translate(screenWidth/2, screenHeight/2)
+	//screen.DrawImage(gophersImage, op)
 
-	// Rotate the image. As a result, the anchor point of this rotate is
-	// the center of the image.
-	op.GeoM.Rotate(float64(g.count%360) * 2 * math.Pi / 360)
+	//Draw debug elements if debug mode is on
+	if config.Cfg.DebugMode {
+		drawDebugText(screen)
+	}
 
-	// Move the image to the screen's center.
-	op.GeoM.Translate(screenWidth/2, screenHeight/2)
+	// When the "left mouse button" is pressed...
+	if ebiten.IsMouseButtonPressed(ebiten.MouseButtonLeft) {
+		ebitenutil.DebugPrint(screen, "You're pressing the 'LEFT' mouse button.")
+	}
+	// When the "right mouse button" is pressed...
+	if ebiten.IsMouseButtonPressed(ebiten.MouseButtonRight) {
+		ebitenutil.DebugPrint(screen, "\nYou're pressing the 'RIGHT' mouse button.")
+	}
+	// When the "middle mouse button" is pressed...
+	if ebiten.IsMouseButtonPressed(ebiten.MouseButtonMiddle) {
+		ebitenutil.DebugPrint(screen, "\n\nYou're pressing the 'MIDDLE' mouse button.")
+	}
+	// When the "up arrow key" is pressed..
+	if ebiten.IsKeyPressed(ebiten.KeyUp) {
+		ebitenutil.DebugPrint(screen, "\nYou're pressing the 'UP' button.")
+	}
+	// When the "down arrow key" is pressed..
+	if ebiten.IsKeyPressed(ebiten.KeyDown) {
+		ebitenutil.DebugPrint(screen, "\n\nYou're pressing the 'DOWN' button.")
+	}
+	// When the "left arrow key" is pressed..
+	if ebiten.IsKeyPressed(ebiten.KeyLeft) {
+		ebitenutil.DebugPrint(screen, "\n\n\nYou're pressing the 'LEFT' button.")
+	}
+	// When the "right arrow key" is pressed..
+	if ebiten.IsKeyPressed(ebiten.KeyRight) {
+		ebitenutil.DebugPrint(screen, "\n\n\n\nYou're pressing the 'RIGHT' button.")
+	}
 
-	screen.DrawImage(gophersImage, op)
+	realtimeButton := button.NewButton(200, 100, "Ably Realtime", 25, 50, colour.Red, screenWidth/4, screenHeight/2)
+	realtimeButton.Draw(screen)
+
+	restButton := button.NewButton(200, 100, "Ably Rest", 35, 50, colour.Red, (screenWidth/4)+(screenWidth/3), screenHeight/2)
+	restButton.Draw(screen)
+
 }
 
 //Layout returns the logical screen size, the screen is automatically scaled.
-func (g *Game) Layout(outsideWidth, outsideHeight int) (int, int) {
+func (a *App) Layout(outsideWidth, outsideHeight int) (int, int) {
 	return screenWidth, screenHeight
 }
 
@@ -66,7 +101,7 @@ func main() {
 
 	ebiten.SetWindowSize(screenWidth, screenHeight)
 	ebiten.SetWindowTitle(titleText)
-	if err := ebiten.RunGame(&Game{}); err != nil {
+	if err := ebiten.RunGame(&App{}); err != nil {
 		log.Fatal(err)
 	}
 }
