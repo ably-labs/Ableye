@@ -12,7 +12,7 @@ var (
 )
 
 func drawRestScreen(screen *ebiten.Image) {
-	ebitenutil.DebugPrintAt(screen, "Ably Rest", screenWidth/2, 50)
+	ebitenutil.DebugPrintAt(screen, "Ably Rest", 0, 0)
 }
 
 func updateRestScreen(){

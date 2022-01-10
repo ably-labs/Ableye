@@ -13,6 +13,7 @@ const(
 
 var (
 	MplusNormalFont font.Face
+	MplusSmallFont font.Face
 )
 
 func init() {
@@ -28,4 +29,9 @@ func init() {
 		Hinting: font.HintingFull,
 	})
 
+	MplusSmallFont = truetype.NewFace(tt, &truetype.Options{
+		Size:    16,
+		DPI:     fontDpi,
+		Hinting: font.HintingFull,
+	})
 }
