@@ -43,6 +43,11 @@ func (b *Button) SetText(text string) {
 	b.text = text
 }
 
+// SetTextColour is used to change the colour of text on a button.
+func (b *Button) SetTextColour(colour *color.NRGBA) {
+	b.textColour = colour
+}
+
 // IsMouseOver returns true if the mouse cursor is over the button image.
 func (b *Button) IsMouseOver() bool {
 
