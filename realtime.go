@@ -1,6 +1,7 @@
 package main
 
 import (
+	"log"
 	"context"
 	"github.com/ably-labs/rosie-demo/config"
 	ably "github.com/ably/ably-go/ably"
@@ -12,9 +13,16 @@ var (
 )
 
 func createRealtimeClient() error {
-	cl, err := ably.NewRealtime(ably.WithKey(config.Cfg.Key))
-	client = cl
-	return err
+	if client == nil {
+		cl, err := ably.NewRealtime(ably.WithKey(config.Cfg.Key))
+		if err != nil {
+			return err
+		}
+		client = cl
+		log.Println(createRealtimeClientSuccess)
+	}
+
+	return nil
 }
 
 func getChannel() {

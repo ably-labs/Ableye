@@ -19,7 +19,7 @@ var (
 )
 
 func initialiseRealtimeScreen() {
-	infoBar = button.NewButton(screenWidth, 50, "information bar", 25, 25, colour.Black, font.MplusSmallFont, colour.White, 0, 25)
+	infoBar = button.NewButton(screenWidth, 35, "information bar", 22, 22, colour.Black, font.MplusSmallFont, colour.White, 0, 25)
 	createClientButton = button.NewButton(200, 100, "create client", 25, 50, colour.Black, font.MplusNormalFont, colour.Yellow, 0, screenHeight/6)
 	createChannelButton = button.NewButton(200, 100, "create channel", 25, 50, colour.Black, font.MplusNormalFont, colour.Yellow, 201, screenHeight/6)
 	publishToChannelButton = button.NewButton(200, 100, "publish msg", 25, 50, colour.Black, font.MplusNormalFont, colour.Yellow, 402, screenHeight/6)
@@ -43,6 +43,7 @@ func updateRealtimeScreen(ctx context.Context) {
 		if err := createRealtimeClient(); err != nil {
 			createClientButton.SetBgColour(colour.Red)
 		}
+		infoBar.SetText(createRealtimeClientSuccess)
 		createClientButton.SetBgColour(colour.Green)
 	}
 
