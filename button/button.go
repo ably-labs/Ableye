@@ -10,25 +10,26 @@ import (
 
 // Button represents a button.
 type Button struct {
-	width       int
-	height      int
+	Width       int
+	Height      int
 	text        string
 	textOffsetX int
 	textOffsetY int
 	textColour  *color.NRGBA
 	font        font.Face
 	BgColour    *color.NRGBA
-	x           int
-	y           int
+	X           int
+	Y           int
 	Image       *ebiten.Image
+	Meta        string // optional meta data
 }
 
 // Draw is used to draw a button to the screen.
 func (b *Button) Draw(screen *ebiten.Image) {
 	opts := &ebiten.DrawImageOptions{}
-	opts.GeoM.Translate(float64(b.x), float64(b.y))
+	opts.GeoM.Translate(float64(b.X), float64(b.Y))
 	screen.DrawImage(b.Image, opts)
-	text.Draw(screen, b.text, b.font, b.x+b.textOffsetX, b.y+b.textOffsetY, b.textColour)
+	text.Draw(screen, b.text, b.font, b.X+b.textOffsetX, b.Y+b.textOffsetY, b.textColour)
 }
 
 // SetBgColour is used to change the background colour of a button.
@@ -47,9 +48,9 @@ func (b *Button) IsMouseOver() bool {
 
 	mouseX, mouseY := ebiten.CursorPosition()
 	// check if mouse X is over the image
-	xIsOver := mouseX >= b.x && mouseX <= (b.x+b.width)
+	xIsOver := mouseX >= b.X && mouseX <= (b.X+b.Width)
 	// check if mouse Y is over the image
-	yIsOver := mouseY >= b.y && mouseY <= (b.y+b.height)
+	yIsOver := mouseY >= b.Y && mouseY <= (b.Y+b.Height)
 
 	return xIsOver && yIsOver
 }
@@ -59,16 +60,16 @@ func NewButton(width int, height int, text string, textOffsetX int, textOffsetY 
 	img := ebiten.NewImage(width, height)
 	img.Fill(bgColour)
 	return Button{
-		width:       width,
-		height:      height,
+		Width:       width,
+		Height:      height,
 		text:        text,
 		textOffsetX: textOffsetX,
 		textOffsetY: textOffsetY,
 		textColour:  textColour,
 		font:        font,
 		BgColour:    bgColour,
-		x:           x,
-		y:           y,
+		X:           x,
+		Y:           y,
 		Image:       img,
 	}
 }
