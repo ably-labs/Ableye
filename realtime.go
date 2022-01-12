@@ -18,6 +18,20 @@ var (
 
 type connectionID int
 
+func (c connectionID) string() string {
+	switch int(c) {
+	case 0:
+		return "Client A"
+	case 1:
+		return "Client B"
+	case 2:
+		return "Client C"
+	case 3:
+		return "Client D"
+	}
+	return ""
+}
+
 const (
 	clientA connectionID = iota
 	clientB
@@ -32,7 +46,7 @@ type connection struct {
 }
 
 // newConnection is a contructor to create a new connection.
-func newConnection(client *ably.Realtime) connection{
+func newConnection(client *ably.Realtime) connection {
 	return connection{
 		client: client,
 	}
@@ -56,7 +70,7 @@ func createRealtimeClient(id connectionID) error {
 // closeRealtimeClient closes an existing realtime client and removes the connection.
 func closeRealtimeClient(id connectionID) {
 
-	if connections[id] != nil && connections[id].client != nil{
+	if connections[id] != nil && connections[id].client != nil {
 		connections[id].client.Close()
 		connections[id] = nil
 		log.Println(closeRealtimeClientSuccess)
