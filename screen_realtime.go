@@ -50,8 +50,9 @@ func drawRealtimeScreen(screen *ebiten.Image) {
 	createClientAButton.Draw(screen)
 
 	// if client A has been created
-	if clients[clientA] != nil {
+	if connections[clientA] != nil && connections[clientA].client != nil {
 		drawAreaUnderButton(screen, createClientAButton)
+
 		setChannelAButton.Draw(screen)
 		closeClientAButton.Draw(screen)
 	}
@@ -60,7 +61,7 @@ func drawRealtimeScreen(screen *ebiten.Image) {
 	createClientBButton.Draw(screen)
 
 	// if client B has been created
-	if clients[clientB] != nil {
+	if connections[clientB] != nil && connections[clientB].client != nil {
 		drawAreaUnderButton(screen, createClientBButton)
 		closeClientBButton.Draw(screen)
 	}
@@ -82,17 +83,17 @@ func updateRealtimeScreen(ctx context.Context) {
 	}
 
 	// Handle mouseover interaction with create client A button while client A does not exist.
-	if createClientAButton.IsMouseOver() && clients[clientA] == nil {
+	if createClientAButton.IsMouseOver() && connections[clientA] == nil {
 		createClientAButton.SetBgColour(colour.Green)
 	} 
 	
-	if !createClientAButton.IsMouseOver() && clients[clientA] == nil{
+	if !createClientAButton.IsMouseOver() && connections[clientA] == nil {
 		createClientAButton.SetBgColour(colour.Yellow)
 	}
 
 	// Handle mouse click on create client A button
 	if ebiten.IsMouseButtonPressed(ebiten.MouseButtonLeft) && createClientAButton.IsMouseOver() {
-		if clients[clientA] == nil {
+		if connections[clientA] == nil {
 			if err := createRealtimeClient(clientA); err != nil {
 				infoBar.SetText(err.Error())
 			}
@@ -125,17 +126,17 @@ func updateRealtimeScreen(ctx context.Context) {
 	}
 
 	// Handle mouseover interaction with create client B button while client B does not exist.
-	if createClientBButton.IsMouseOver() && clients[clientB] == nil {
+	if createClientBButton.IsMouseOver() && connections[clientB]  == nil {
 		createClientBButton.SetBgColour(colour.Green)
 	} 
 	
-	if !createClientBButton.IsMouseOver() && clients[clientB] == nil{
+	if !createClientBButton.IsMouseOver() && connections[clientB] == nil{
 		createClientBButton.SetBgColour(colour.Yellow)
 	}
 
 	// Handle mouse click on create client B button
 	if ebiten.IsMouseButtonPressed(ebiten.MouseButtonLeft) && createClientBButton.IsMouseOver() {
-		if clients[clientB] == nil {
+		if connections[clientB]  == nil {
 			if err := createRealtimeClient(clientB); err != nil {
 				infoBar.SetText(err.Error())
 			}

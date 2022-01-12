@@ -8,42 +8,57 @@ import (
 )
 
 func init() {
-	// Initialise a map to store a client for each clientID.
-	clients = make(map[clientID]*ably.Realtime)
+	// Initialise a map to store connections to the ably platform.
+	connections = make(map[connectionID]*connection)
 }
 
 var (
-	clients map[clientID]*ably.Realtime
-//	channel *ably.RealtimeChannel
+	connections map[connectionID]*connection
 )
 
-type clientID int
+type connectionID int
 
 const (
-	clientA clientID = iota
+	clientA connectionID = iota
 	clientB
 	clientC
 	clientD
 )
 
-// createRealtimeClient creates a new realtime client and stores it in the clients map against the key of clientID.
-func createRealtimeClient(id clientID) error {
+// connection represents a connection to the Ably platform.
+type connection struct {
+	client  *ably.Realtime
+	channel *ably.RealtimeChannel
+}
+
+// newConnection is a contructor to create a new connection.
+func newConnection(client *ably.Realtime) connection{
+	return connection{
+		client: client,
+	}
+}
+
+// createRealtimeClient creates a new realtime client and stores it in a connection.
+func createRealtimeClient(id connectionID) error {
+
 	newClient, err := ably.NewRealtime(ably.WithKey(config.Cfg.Key))
 	if err != nil {
 		return err
 	}
 
-	clients[id] = newClient
+	connection := newConnection(newClient)
+	connections[id] = &connection
 	log.Println(createRealtimeClientSuccess)
 
 	return nil
 }
 
-// closeRealtimeClient closes an existing realtime client and removes it from the clients map.
-func closeRealtimeClient(id clientID) {
-	if clients[id] != nil {
-		clients[id].Close()
-		clients[id] = nil
+// closeRealtimeClient closes an existing realtime client and removes the connection.
+func closeRealtimeClient(id connectionID) {
+
+	if connections[id] != nil && connections[id].client != nil{
+		connections[id].client.Close()
+		connections[id] = nil
 		log.Println(closeRealtimeClientSuccess)
 	}
 }
