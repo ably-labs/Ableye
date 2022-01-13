@@ -12,37 +12,41 @@ import (
 	"github.com/hajimehoshi/ebiten/v2/inpututil"
 )
 
+type connectionElements struct {
+	id           connectionID
+	createClient button.Button
+	closeClient  button.Button
+	setChannel   button.Button
+	channelInfo  text.Text
+}
+
 // The elements of the realtime screen.
 var (
 	infoBar button.Button
 
 	//Connection A elements
-	createClientAButton button.Button
-	closeClientAButton  button.Button
-	setChannelAButton   button.Button
-	displayChannelA     text.Text
+	connectionA connectionElements
 
 	//Connection B elements
-	createClientBButton button.Button
-	closeClientBButton  button.Button
-	setChannelBButton   button.Button
-	displayChannelB     text.Text
+	connectionB connectionElements
 )
 
 func initialiseRealtimeScreen() {
 	infoBar = button.NewButton(screenWidth, 35, "information bar", 22, 22, colour.Black, font.MplusSmallFont, colour.White, 0, 25)
 
-	//Connection A elements
-	createClientAButton = button.NewButton(200, 35, createClientText, 22, 22, colour.Black, font.MplusSmallFont, colour.Yellow, 0, screenHeight/6)
-	closeClientAButton = button.NewButton(35, 35, "X", 12, 22, colour.Black, font.MplusSmallFont, colour.Red, (screenWidth/2)-45, screenHeight/6)
-	setChannelAButton = button.NewButton(200, 35, setChannelText, 22, 22, colour.Black, font.MplusSmallFont, colour.Yellow, 201, screenHeight/6)
-	displayChannelA = text.NewText("", colour.Yellow, font.MplusSmallFont, 0, 0)
+	//Initialise connection A elements.
+	connectionA.id = clientA
+	connectionA.createClient = button.NewButton(200, 35, createClientText, 22, 22, colour.Black, font.MplusSmallFont, colour.Yellow, 0, screenHeight/6)
+	connectionA.closeClient = button.NewButton(35, 35, "X", 12, 22, colour.Black, font.MplusSmallFont, colour.Red, (screenWidth/2)-45, screenHeight/6)
+	connectionA.setChannel = button.NewButton(200, 35, setChannelText, 22, 22, colour.Black, font.MplusSmallFont, colour.Yellow, 201, screenHeight/6)
+	connectionA.channelInfo = text.NewText("", colour.Yellow, font.MplusSmallFont, 0, 0)
 
-	//Connection B elements
-	createClientBButton = button.NewButton(200, 35, createClientText, 22, 22, colour.Black, font.MplusSmallFont, colour.Yellow, screenWidth/2, screenHeight/6)
-	closeClientBButton = button.NewButton(35, 35, "X", 12, 22, colour.Black, font.MplusSmallFont, colour.Red, (screenWidth)-45, screenHeight/6)
-	setChannelBButton = button.NewButton(200, 35, setChannelText, 22, 22, colour.Black, font.MplusSmallFont, colour.Yellow, (screenWidth/2)+201, screenHeight/6)
-	displayChannelB = text.NewText("", colour.Yellow, font.MplusSmallFont, 0, 0)
+	//Create Connection B elements
+	connectionB.id = clientB
+	connectionB.createClient = button.NewButton(200, 35, createClientText, 22, 22, colour.Black, font.MplusSmallFont, colour.Yellow, screenWidth/2, screenHeight/6)
+	connectionB.closeClient = button.NewButton(35, 35, "X", 12, 22, colour.Black, font.MplusSmallFont, colour.Red, (screenWidth)-45, screenHeight/6)
+	connectionB.setChannel = button.NewButton(200, 35, setChannelText, 22, 22, colour.Black, font.MplusSmallFont, colour.Yellow, (screenWidth/2)+201, screenHeight/6)
+	connectionB.channelInfo = text.NewText("", colour.Yellow, font.MplusSmallFont, 0, 0)
 }
 
 func drawRealtimeScreen(screen *ebiten.Image) {
@@ -50,39 +54,34 @@ func drawRealtimeScreen(screen *ebiten.Image) {
 	infoBar.Draw(screen)
 
 	//Connection A elements
-	createClientAButton.Draw(screen)
-
-	// if client A has been created
-	if connections[clientA] != nil && connections[clientA].client != nil {
-		drawClientInfo(screen, createClientAButton)
-		// if a channel has not been set for this client, draw the set channel button.
-		if connections[clientA].channel == nil {
-			setChannelAButton.Draw(screen)
-		}
-		closeClientAButton.Draw(screen)
-	}
-
-	// if client A channel has been created
-	if connections[clientA] != nil && connections[clientA].channel != nil {
-		drawChannelInfo(screen, createClientAButton, displayChannelA, clientA)
-	}
+	drawConnectionElements(screen, connectionA)
 
 	//Connection B elements
-	createClientBButton.Draw(screen)
+	drawConnectionElements(screen, connectionB)
+}
 
-	// if client B has been created
-	if connections[clientB] != nil && connections[clientB].client != nil {
-		drawClientInfo(screen, createClientBButton)
+// drawConnectionElements draws all the elements associated with a connection to the screen.
+func drawConnectionElements(screen *ebiten.Image, elements connectionElements) {
+
+	id := elements.id
+
+	// Draw the button to create a new client.
+	elements.createClient.Draw(screen)
+
+	// if client has been created
+	if connections[id] != nil && connections[id].client != nil {
+		drawClientInfo(screen, elements.createClient)
 		// if a channel has not been set for this client, draw the set channel button.
-		if connections[clientB].channel == nil {
-			setChannelBButton.Draw(screen)
+		if connections[id].channel == nil {
+			elements.setChannel.Draw(screen)
 		}
-		closeClientBButton.Draw(screen)
+		// draw the close client button.
+		elements.closeClient.Draw(screen)
 	}
 
-	// if client B channel has been created
-	if connections[clientB] != nil && connections[clientB].channel != nil {
-		drawChannelInfo(screen, createClientBButton, displayChannelB, clientB)
+	// if client channel has been created
+	if connections[id] != nil && connections[id].channel != nil {
+		drawChannelInfo(screen, elements.createClient, elements.channelInfo, id)
 	}
 }
 
@@ -91,14 +90,14 @@ func updateRealtimeScreen(ctx context.Context) {
 		state = titleScreen
 	}
 
-	updateCreateClientButton(&createClientAButton, clientA)
-	updateCreateClientButton(&createClientBButton, clientB)
+	updateCreateClientButton(&connectionA.createClient, connectionA.id)
+	updateCreateClientButton(&connectionB.createClient, connectionB.id)
 
-	updateCloseClientButton(&closeClientAButton, &createClientAButton, clientA)
-	updateCloseClientButton(&closeClientBButton, &createClientBButton, clientB)
+	updateCloseClientButton(&connectionA.closeClient, &connectionA.createClient, connectionA.id)
+	updateCloseClientButton(&connectionB.closeClient, &connectionB.createClient, connectionB.id)
 
-	updateSetChannelButton(&setChannelAButton, clientA)
-	updateSetChannelButton(&setChannelBButton, clientB)
+	updateSetChannelButton(&connectionA.setChannel, connectionA.id)
+	updateSetChannelButton(&connectionB.setChannel, connectionB.id)
 
 }
 
