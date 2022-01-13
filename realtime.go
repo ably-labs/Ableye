@@ -77,10 +77,10 @@ func closeRealtimeClient(id connectionID) {
 	}
 }
 
-func setChannel() {
-
-	// TO DO create some kind of struct (maybe a session?) to hold both a client and it's active channel.
-	//	channel = client.Channels.Get("test")
+func setChannel(id connectionID) {
+	newChannel := connections[id].client.Channels.Get(defaultChannel)
+	connections[id].channel = newChannel
+	log.Println(setChannelSuccess)
 }
 
 func publishToChannel(ctx context.Context) error {

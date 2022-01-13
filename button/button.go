@@ -21,7 +21,6 @@ type Button struct {
 	X           int
 	Y           int
 	Image       *ebiten.Image
-	Meta        string // optional meta data
 }
 
 // Draw is used to draw a button to the screen.
