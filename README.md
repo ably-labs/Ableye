@@ -5,13 +5,24 @@ This is my demo project using Go and Ably Realtime.
 I want to create a tool which can be used to do exploratory testing of Go SDK
 Similar to how Postman can be used to exploratory testing of an API
 
+
+## Work in progress
+
 Work in progress project name: Ableye
 
-Want two clickable buttons to select which client is being tested
+Completed:
+* Screen to select which client (realtime or rest)
+* Can create realtime clients
+* Can close realtime clients
+* Can set a default channel for a realtime client
 
-Create Read Update Delete of channels - in a visual way
+TODO:
 
-Subscribe a client to a channel
+* Subscribe a client to a channel
+* Unsubscribe a client to a channel
+* Publish to a channel
+* Display messages received on a channel
+* Add some nice graphics
 
 ## Setup 
 If you don't have one already, [create a new Ably account](https://ably.com/sign-up)

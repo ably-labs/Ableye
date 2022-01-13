@@ -16,13 +16,13 @@ import (
 var (
 	infoBar button.Button
 
-	//Client A
+	//Connection A elements
 	createClientAButton button.Button
 	closeClientAButton  button.Button
 	setChannelAButton   button.Button
 	displayChannelA     text.Text
 
-	//Client B
+	//Connection B elements
 	createClientBButton button.Button
 	closeClientBButton  button.Button
 	setChannelBButton   button.Button
@@ -32,13 +32,13 @@ var (
 func initialiseRealtimeScreen() {
 	infoBar = button.NewButton(screenWidth, 35, "information bar", 22, 22, colour.Black, font.MplusSmallFont, colour.White, 0, 25)
 
-	//Client A
+	//Connection A elements
 	createClientAButton = button.NewButton(200, 35, createClientText, 22, 22, colour.Black, font.MplusSmallFont, colour.Yellow, 0, screenHeight/6)
 	closeClientAButton = button.NewButton(35, 35, "X", 12, 22, colour.Black, font.MplusSmallFont, colour.Red, (screenWidth/2)-45, screenHeight/6)
 	setChannelAButton = button.NewButton(200, 35, setChannelText, 22, 22, colour.Black, font.MplusSmallFont, colour.Yellow, 201, screenHeight/6)
 	displayChannelA = text.NewText("", colour.Yellow, font.MplusSmallFont, 0, 0)
 
-	//Client B
+	//Connection B elements
 	createClientBButton = button.NewButton(200, 35, createClientText, 22, 22, colour.Black, font.MplusSmallFont, colour.Yellow, screenWidth/2, screenHeight/6)
 	closeClientBButton = button.NewButton(35, 35, "X", 12, 22, colour.Black, font.MplusSmallFont, colour.Red, (screenWidth)-45, screenHeight/6)
 	setChannelBButton = button.NewButton(200, 35, setChannelText, 22, 22, colour.Black, font.MplusSmallFont, colour.Yellow, (screenWidth/2)+201, screenHeight/6)
@@ -49,12 +49,12 @@ func drawRealtimeScreen(screen *ebiten.Image) {
 	ebitenutil.DebugPrintAt(screen, "Ably Realtime", 0, 0)
 	infoBar.Draw(screen)
 
-	//Client A
+	//Connection A elements
 	createClientAButton.Draw(screen)
 
 	// if client A has been created
 	if connections[clientA] != nil && connections[clientA].client != nil {
-		drawClientAreaUnderButton(screen, createClientAButton)
+		drawClientInfo(screen, createClientAButton)
 		// if a channel has not been set for this client, draw the set channel button.
 		if connections[clientA].channel == nil {
 			setChannelAButton.Draw(screen)
@@ -67,12 +67,12 @@ func drawRealtimeScreen(screen *ebiten.Image) {
 		drawChannelInfo(screen, createClientAButton, displayChannelA, clientA)
 	}
 
-	//Client B
+	//Connection B elements
 	createClientBButton.Draw(screen)
 
 	// if client B has been created
 	if connections[clientB] != nil && connections[clientB].client != nil {
-		drawClientAreaUnderButton(screen, createClientBButton)
+		drawClientInfo(screen, createClientBButton)
 		// if a channel has not been set for this client, draw the set channel button.
 		if connections[clientB].channel == nil {
 			setChannelBButton.Draw(screen)
@@ -97,25 +97,14 @@ func updateRealtimeScreen(ctx context.Context) {
 	updateCloseClientButton(&closeClientAButton, &createClientAButton, clientA)
 	updateCloseClientButton(&closeClientBButton, &createClientBButton, clientB)
 
-	// Handle mouse click on set channel A button
-	if ebiten.IsMouseButtonPressed(ebiten.MouseButtonLeft) && setChannelAButton.IsMouseOver() {
-		if connections[clientA] != nil && connections[clientA].channel == nil {
-			setChannel(clientA)
-			infoBar.SetText(setChannelSuccess)
-		}
-	}
+	updateSetChannelButton(&setChannelAButton, clientA)
+	updateSetChannelButton(&setChannelBButton, clientB)
 
-	// Handle mouse click on set channel B button
-	if ebiten.IsMouseButtonPressed(ebiten.MouseButtonLeft) && setChannelBButton.IsMouseOver() {
-		if connections[clientB] != nil && connections[clientB].channel == nil {
-			setChannel(clientB)
-			infoBar.SetText(setChannelSuccess)
-		}
-	}
 }
 
-// drawClientAreaUnderButton draws a rectangle offset to touch the bottom edge of an existing button
-func drawClientAreaUnderButton(screen *ebiten.Image, button button.Button) {
+// drawClientInfo draws a rectangle that is used to display client information.
+// This rectangle is anchored to an existing button.
+func drawClientInfo(screen *ebiten.Image, button button.Button) {
 	ebitenutil.DrawRect(screen, float64(button.X), (float64(button.Y) + float64(button.Height)), (screenWidth/2)-10, screenHeight/3, colour.Green)
 	ebitenutil.DrawRect(screen, float64(button.X)+1, (float64(button.Y)+float64(button.Height))+1, (screenWidth/2)-12, (screenHeight/3)-2, colour.Black)
 
@@ -159,7 +148,6 @@ func updateCreateClientButton(button *button.Button, id connectionID) {
 // updateCloseClientButton contains the update logic for each close client button.
 // a createButton is passed to this function so it can be reset after a client is closed.
 func updateCloseClientButton(closeButton *button.Button, createButton *button.Button, id connectionID) {
-
 	// Handle mouseover interaction with a close client button
 	if closeButton.IsMouseOver() {
 		closeButton.SetTextColour(colour.White)
@@ -174,5 +162,17 @@ func updateCloseClientButton(closeButton *button.Button, createButton *button.Bu
 		// reset the create button once a client is closed.
 		createButton.SetBgColour(colour.Yellow)
 		createButton.SetText(createClientText)
+	}
+}
+
+// updateSetChannelButton contains the update logic for each set channel button.
+func updateSetChannelButton(button *button.Button, id connectionID) {
+	// Handle mouse click on set channel button
+	if ebiten.IsMouseButtonPressed(ebiten.MouseButtonLeft) && button.IsMouseOver() {
+		// if the connection exists and does not have a channel.
+		if connections[id] != nil && connections[id].channel == nil {
+			setChannel(id)
+			infoBar.SetText(setChannelSuccess)
+		}
 	}
 }
