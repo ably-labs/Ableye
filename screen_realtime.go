@@ -37,18 +37,18 @@ func initialiseRealtimeScreen() {
 
 	//Initialise connection A elements.
 	connectionA.id = clientA
-	connectionA.createClient = button.NewButton(200, 35, createClientText, 22, 22, colour.Black, font.MplusSmallFont, colour.Yellow, 0, screenHeight/6)
+	connectionA.createClient = button.NewButton(150, 35, createClientText, 22, 22, colour.Black, font.MplusSmallFont, colour.Yellow, 0, screenHeight/6)
 	connectionA.closeClient = button.NewButton(35, 35, "X", 12, 22, colour.Black, font.MplusSmallFont, colour.Red, (screenWidth/2)-45, screenHeight/6)
-	connectionA.setChannel = button.NewButton(200, 35, setChannelText, 22, 22, colour.Black, font.MplusSmallFont, colour.Yellow, 201, screenHeight/6)
+	connectionA.setChannel = button.NewButton(150, 35, setChannelText, 22, 22, colour.Black, font.MplusSmallFont, colour.Yellow, 151, screenHeight/6)
 	connectionA.channelName = text.NewText("", colour.Yellow, font.MplusSmallFont, 0, 0)
 	connectionA.channelStatus = text.NewText("", colour.White, font.MplusSmallFont, 0, 0)
 	connectionA.channelSubscribeAll = button.NewButton(150, 30, subscribeAllText, 12, 20, colour.Black, font.MplusSmallFont, colour.Yellow, 0, 0)
 
 	//Create Connection B elements
 	connectionB.id = clientB
-	connectionB.createClient = button.NewButton(200, 35, createClientText, 22, 22, colour.Black, font.MplusSmallFont, colour.Yellow, screenWidth/2, screenHeight/6)
+	connectionB.createClient = button.NewButton(150, 35, createClientText, 22, 22, colour.Black, font.MplusSmallFont, colour.Yellow, screenWidth/2, screenHeight/6)
 	connectionB.closeClient = button.NewButton(35, 35, "X", 12, 22, colour.Black, font.MplusSmallFont, colour.Red, (screenWidth)-45, screenHeight/6)
-	connectionB.setChannel = button.NewButton(200, 35, setChannelText, 22, 22, colour.Black, font.MplusSmallFont, colour.Yellow, (screenWidth/2)+201, screenHeight/6)
+	connectionB.setChannel = button.NewButton(150, 35, setChannelText, 22, 22, colour.Black, font.MplusSmallFont, colour.Yellow, (screenWidth/2)+151, screenHeight/6)
 	connectionB.channelName = text.NewText("", colour.Yellow, font.MplusSmallFont, 0, 0)
 	connectionB.channelStatus = text.NewText("", colour.White, font.MplusSmallFont, 0, 0)
 	connectionB.channelSubscribeAll = button.NewButton(150, 30, subscribeAllText, 12, 20, colour.Black, font.MplusSmallFont, colour.Yellow, 0, 0)
@@ -133,7 +133,6 @@ func drawChannelInfo(screen *ebiten.Image, button button.Button, channelName tex
 	channelSubscribeAll.SetX(button.X + 400)
 	channelSubscribeAll.SetY((button.Y + button.Height) + 4)
 	channelSubscribeAll.Draw(screen)
-
 }
 
 // updateCreateClientButton contains the update logic for each client creation button.
@@ -214,13 +213,16 @@ func updateSubscribeChannelButton(button *button.Button, id connectionID) {
 	}
 
 	// if the button is not moused over and the channel is not subscribed.
-	if !button.IsMouseOver() && connections[id] != nil && connections[id].unsubscribeAll == nil{
+	if !button.IsMouseOver() && connections[id] != nil && connections[id].unsubscribeAll == nil {
 		button.SetBgColour(colour.Yellow)
 	}
 
 	// Handle mouse click on subscribe all button
-	if ebiten.IsMouseButtonPressed(ebiten.MouseButtonLeft) && button.IsMouseOver() {
-		// if a channel exists and the connection has no unsubscribeAll function saved.
+	// As this button toggles between two states, the trigger is the mouse button releasing.
+	// This prevents the button from quickly toggling if the mouse button is held down.
+	if inpututil.IsMouseButtonJustReleased(ebiten.MouseButtonLeft) && button.IsMouseOver() {
+		// if a channel exists and the connection has no unsubscribeAll function saved
+
 		if connections[id].channel != nil && connections[id].unsubscribeAll == nil {
 
 			unsubscribeAll, err := subscribeAll(id)
@@ -234,6 +236,15 @@ func updateSubscribeChannelButton(button *button.Button, id connectionID) {
 			// Change the SubscribeAll button into an UnsubscribeAll button.
 			button.SetBgColour(colour.Red)
 			button.SetText(unsubscribeAllText)
+			return
+		}
+
+		// if there is an unsubscribeAll function saved
+		if connections[id].unsubscribeAll != nil {
+			unsubscribeAll(id)
+			infoBar.SetText(unsubscribeAllSuccess)
+			connections[id].unsubscribeAll = nil
+			return
 		}
 	}
 }

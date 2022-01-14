@@ -86,12 +86,14 @@ func closeRealtimeClient(id connectionID) {
 	}
 }
 
+// setChannel sets the channel to the default channel for a connection.
 func setChannel(id connectionID) {
 	newChannel := connections[id].client.Channels.Get(defaultChannel)
 	connections[id].channel = newChannel
 	log.Println(setChannelSuccess)
 }
 
+// subscribeAll subscribes the connection's channel to all messsages.
 func subscribeAll(id connectionID) (func(), error) {
 	unsubscribe, err := connections[id].channel.SubscribeAll(connections[id].context, printAblyMessage)
 
@@ -100,6 +102,16 @@ func subscribeAll(id connectionID) (func(), error) {
 	}
 	log.Println(subscribeAllSuccess)
 	return unsubscribe, nil
+}
+
+// unsubscribeAll calls a connections unsubscribe all function if it exists.
+func unsubscribeAll(id connectionID){
+	if connections[id].unsubscribeAll != nil {
+		unsubscribeFunc := *connections[id].unsubscribeAll
+		unsubscribeFunc()
+		log.Println(unsubscribeAllSuccess)
+	}
+	
 }
 
 // func publishToChannel(ctx context.Context) error {

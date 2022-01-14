@@ -15,13 +15,14 @@ Completed:
 * Can create realtime clients
 * Can close realtime clients
 * Can set a default channel for a realtime client
+* Can subscribe to all messages on a channel
+* Can unsubscribe from all messages on a channel
 
 TODO:
 
-* Subscribe a client to a channel
-* Unsubscribe a client to a channel
 * Publish to a channel
 * Display messages received on a channel
+* Display channel presence information
 * Add some nice graphics
 
 ## Setup 
@@ -50,3 +51,10 @@ github.com/ably/ably-go/ably.NewREST({0xc0002edbd0, 0x0, 0xd3})
 github.com/ably/ably-go/ably.NewRealtime({0xc0002edbd0, 0x1, 0x1})
         /Users/rosiehamilton/go/pkg/mod/github.com/ably/ably-go@v1.2.3/ably/realtime_client.go:23 +0x52
 ```
+
+### Channel State
+Once a channel has subscribed to all messages, its state changes from `INITIALIZED` to `ATTACHED`.
+If the unsubscribe function is then called, the channel state remains `ATTACHED` even though its been unsubscribed.
+I was expecting the state to change to something else as it's no longer attached.
+
+
