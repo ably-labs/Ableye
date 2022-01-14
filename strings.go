@@ -14,4 +14,5 @@ var (
 	setChannelText     = "Set Channel"
 	subscribeAllText   = "Subscribe All"
 	unsubscribeAllText = "Unsubscribe All"
+	getPresenceText    = "Get Presence"
 )

@@ -45,6 +45,7 @@ type connection struct {
 	context        context.Context
 	client         *ably.Realtime
 	channel        *ably.RealtimeChannel
+	presence       []*ably.PresenceMessage
 	unsubscribeAll *func()
 }
 
@@ -77,7 +78,7 @@ func closeRealtimeClient(id connectionID) {
 
 	if connections[id] != nil && connections[id].client != nil {
 		connections[id].client.Close()
-		
+
 		//Tear down the connection in internal memory.
 		connections[id].unsubscribeAll = nil
 		connections[id] = nil
@@ -105,13 +106,13 @@ func subscribeAll(id connectionID) (func(), error) {
 }
 
 // unsubscribeAll calls a connections unsubscribe all function if it exists.
-func unsubscribeAll(id connectionID){
+func unsubscribeAll(id connectionID) {
 	if connections[id].unsubscribeAll != nil {
 		unsubscribeFunc := *connections[id].unsubscribeAll
 		unsubscribeFunc()
 		log.Println(unsubscribeAllSuccess)
 	}
-	
+
 }
 
 // func publishToChannel(ctx context.Context) error {
@@ -122,3 +123,21 @@ func unsubscribeAll(id connectionID){
 func printAblyMessage(msg *ably.Message) {
 	fmt.Printf("Received message: name=%s data=%v\n", msg.Name, msg.Data)
 }
+
+// func getPresence(id connectionID) (*string, error) {
+// 	var buffer bytes.Buffer
+// 	presenceMessages, err := connections[id].channel.Presence.Get(connections[id].context)
+// 	if err != nil {
+// 		return nil, err
+// 	}
+
+// 	for i := range presenceMessages {
+// 		buffer.WriteString(presenceMessages[i].Name)
+// 		fmt.Println("writing to presence")
+// 		fmt.Println(presenceMessages[i].Name)
+// 		buffer.WriteString(" ")
+// 	}
+// 	presence := buffer.String()
+// 	return &presence, nil
+// }
+

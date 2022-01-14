@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+
 	"github.com/ably-labs/rosie-demo/button"
 	colour "github.com/ably-labs/rosie-demo/colours"
 	font "github.com/ably-labs/rosie-demo/fonts"
@@ -19,6 +20,9 @@ type connectionElements struct {
 	channelName         text.Text
 	channelStatus       text.Text
 	channelSubscribeAll button.Button
+	presenceInfo        text.Text
+	getPresence 	button.Button
+
 }
 
 // The elements of the realtime screen.
@@ -43,6 +47,9 @@ func initialiseRealtimeScreen() {
 	connectionA.channelName = text.NewText("", colour.Yellow, font.MplusSmallFont, 0, 0)
 	connectionA.channelStatus = text.NewText("", colour.White, font.MplusSmallFont, 0, 0)
 	connectionA.channelSubscribeAll = button.NewButton(150, 30, subscribeAllText, 12, 20, colour.Black, font.MplusSmallFont, colour.Yellow, 0, 0)
+	connectionA.presenceInfo = text.NewText("", colour.Cyan, font.MplusSmallFont, 0, 0)
+	connectionA.getPresence = button.NewButton(150, 30, getPresenceText, 12, 20, colour.Black, font.MplusSmallFont, colour.Cyan, 0, 0)
+
 
 	//Create Connection B elements
 	connectionB.id = clientB
@@ -52,6 +59,8 @@ func initialiseRealtimeScreen() {
 	connectionB.channelName = text.NewText("", colour.Yellow, font.MplusSmallFont, 0, 0)
 	connectionB.channelStatus = text.NewText("", colour.White, font.MplusSmallFont, 0, 0)
 	connectionB.channelSubscribeAll = button.NewButton(150, 30, subscribeAllText, 12, 20, colour.Black, font.MplusSmallFont, colour.Yellow, 0, 0)
+	connectionB.presenceInfo = text.NewText("", colour.Cyan, font.MplusSmallFont, 0, 0)
+	connectionB.getPresence = button.NewButton(150, 30, getPresenceText, 12, 20, colour.Black, font.MplusSmallFont, colour.Cyan, 0, 0)
 
 }
 
@@ -87,7 +96,7 @@ func drawConnectionElements(screen *ebiten.Image, elements *connectionElements) 
 
 	// if client channel has been created
 	if connections[id] != nil && connections[id].channel != nil {
-		drawChannelInfo(screen, elements.createClient, elements.channelName, elements.channelStatus, &elements.channelSubscribeAll, id)
+		drawChannelInfo(screen, elements)
 	}
 }
 
@@ -119,20 +128,39 @@ func drawClientInfo(screen *ebiten.Image, button button.Button) {
 }
 
 // drawChannelInfo draws channel information, it's location is anchored to an existing button
-func drawChannelInfo(screen *ebiten.Image, button button.Button, channelName text.Text, channelStatus text.Text, channelSubscribeAll *button.Button, id connectionID) {
-	ebitenutil.DrawRect(screen, float64(button.X)+4, (float64(button.Y)+float64(button.Height))+3, (screenWidth/2)-18, screenHeight/24, colour.Yellow)
-	ebitenutil.DrawRect(screen, float64(button.X)+5, (float64(button.Y)+float64(button.Height))+4, (screenWidth/2)-20, (screenHeight/24)-2, colour.Black)
-	channelName.SetX(button.X + 5)
-	channelName.SetY((button.Y + button.Height) + 25)
-	channelName.SetText(fmt.Sprintf("Channel : %s", connections[id].channel.Name))
-	channelName.Draw(screen)
-	channelStatus.SetX(button.X + 200)
-	channelStatus.SetY((button.Y + button.Height) + 25)
-	channelStatus.SetText(fmt.Sprintf("Status : %s", connections[id].channel.State()))
-	channelStatus.Draw(screen)
-	channelSubscribeAll.SetX(button.X + 400)
-	channelSubscribeAll.SetY((button.Y + button.Height) + 4)
-	channelSubscribeAll.Draw(screen)
+func drawChannelInfo(screen *ebiten.Image, elements *connectionElements) {
+	// button is used to anchor the channel information, everything is drawn relative to the button.
+	button := elements.createClient
+	id := elements.id
+
+	ebitenutil.DrawRect(screen, float64(button.X)+4, (float64(button.Y)+float64(button.Height))+3, (screenWidth/2)-18, screenHeight/10, colour.Yellow)
+	ebitenutil.DrawRect(screen, float64(button.X)+5, (float64(button.Y)+float64(button.Height))+4, (screenWidth/2)-20, (screenHeight/10)-2, colour.Black)
+	elements.channelName.SetX(button.X + 10)
+	elements.channelName.SetY((button.Y + button.Height) + 25)
+	elements.channelName.SetText(fmt.Sprintf("Channel : %s", connections[id].channel.Name))
+	elements.channelName.Draw(screen)
+
+	elements.channelStatus.SetX(button.X + 200)
+	elements.channelStatus.SetY((button.Y + button.Height) + 25)
+	elements.channelStatus.SetText(fmt.Sprintf("Status : %s", connections[id].channel.State()))
+	elements.channelStatus.Draw(screen)
+
+	elements.channelSubscribeAll.SetX(button.X + 400)
+	elements.channelSubscribeAll.SetY((button.Y + button.Height) + 4)
+	elements.channelSubscribeAll.Draw(screen)
+
+	// draw presense info
+	ebitenutil.DrawRect(screen, float64(button.X)+8, (float64(button.Y)+float64(button.Height))+42, (screenWidth/2)-26, screenHeight/24, colour.Cyan)
+	ebitenutil.DrawRect(screen, float64(button.X)+9, (float64(button.Y)+float64(button.Height))+43, (screenWidth/2)-28, (screenHeight/24)-2, colour.Black)
+
+	elements.presenceInfo.SetX(button.X + 12)
+	elements.presenceInfo.SetY(button.Y + button.Height + 62)
+	elements.presenceInfo.SetText(fmt.Sprintf("Presence : %s", "foo"))
+	elements.presenceInfo.Draw(screen)
+
+	elements.getPresence.SetX(button.X + 400)
+	elements.getPresence.SetY(button.Y + button.Height + 43)
+	elements.getPresence.Draw(screen)
 }
 
 // updateCreateClientButton contains the update logic for each client creation button.
@@ -248,3 +276,4 @@ func updateSubscribeChannelButton(button *button.Button, id connectionID) {
 		}
 	}
 }
+
