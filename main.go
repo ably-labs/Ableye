@@ -1,7 +1,6 @@
 package main
 
 import (
-	"context"
 	_ "image/jpeg"
 	"log"
 
@@ -18,15 +17,11 @@ func init() {
 	state = titleScreen
 }
 
-type Game struct {
-	context context.Context
-}
+type Game struct {}
 
-// NewGame is a constructor for the game which injects dependencies.
-func NewGame(ctx context.Context) Game {
-	return Game{
-		context: ctx,
-	}
+// NewGame is a constructor for the game.
+func NewGame() *Game {
+	return &Game{}
 }
 
 //Update updates the logical state.
@@ -37,7 +32,7 @@ func (g *Game) Update() error {
 	case titleScreen:
 		updateTitleScreen()
 	case realtimeScreen:
-		updateRealtimeScreen(g.context)
+		updateRealtimeScreen()
 	case restScreen:
 		updateRestScreen()
 	}
@@ -78,14 +73,11 @@ func main() {
 	initialiseTitleScreen()
 	initialiseRealtimeScreen()
 
-	// Create a new context to use with Ably.
-	ctx := context.Background()
-
-	// Create a new instance of game and inject the context.
-	game := NewGame(ctx)
+	// Create a new instance of game.
+	game := NewGame()
 
 	// Run the game.
-	if err := ebiten.RunGame(&game); err != nil {
+	if err := ebiten.RunGame(game); err != nil {
 		log.Fatal(err)
 	}
 }

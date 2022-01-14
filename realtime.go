@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"fmt"
 	"github.com/ably-labs/rosie-demo/config"
 	ably "github.com/ably/ably-go/ably"
 	"log"
@@ -41,14 +42,18 @@ const (
 
 // connection represents a connection to the Ably platform.
 type connection struct {
-	client  *ably.Realtime
-	channel *ably.RealtimeChannel
+	context        context.Context
+	client         *ably.Realtime
+	channel        *ably.RealtimeChannel
+	unsubscribeAll *func()
 }
 
 // newConnection is a contructor to create a new connection.
 func newConnection(client *ably.Realtime) connection {
+	ctx := context.Background()
 	return connection{
-		client: client,
+		context: ctx,
+		client:  client,
 	}
 }
 
@@ -72,7 +77,11 @@ func closeRealtimeClient(id connectionID) {
 
 	if connections[id] != nil && connections[id].client != nil {
 		connections[id].client.Close()
+		
+		//Tear down the connection in internal memory.
+		connections[id].unsubscribeAll = nil
 		connections[id] = nil
+
 		log.Println(closeRealtimeClientSuccess)
 	}
 }
@@ -83,7 +92,21 @@ func setChannel(id connectionID) {
 	log.Println(setChannelSuccess)
 }
 
-func publishToChannel(ctx context.Context) error {
-	//return channel.Publish(ctx, "EventName1", "EventData1")
-	return nil
+func subscribeAll(id connectionID) (func(), error) {
+	unsubscribe, err := connections[id].channel.SubscribeAll(connections[id].context, printAblyMessage)
+
+	if err != nil {
+		return nil, err
+	}
+	log.Println(subscribeAllSuccess)
+	return unsubscribe, nil
+}
+
+// func publishToChannel(ctx context.Context) error {
+// 	//return channel.Publish(ctx, "EventName1", "EventData1")
+// 	return nil
+// }
+
+func printAblyMessage(msg *ably.Message) {
+	fmt.Printf("Received message: name=%s data=%v\n", msg.Name, msg.Data)
 }

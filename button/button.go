@@ -47,9 +47,18 @@ func (b *Button) SetTextColour(colour *color.NRGBA) {
 	b.textColour = colour
 }
 
+// SetX is used to change the X value of a button.
+func (b *Button) SetX(x int) {
+	b.X = x
+}
+
+// SetY is used to change the X value of a button.
+func (b *Button) SetY(y int) {
+	b.Y = y
+}
+
 // IsMouseOver returns true if the mouse cursor is over the button image.
 func (b *Button) IsMouseOver() bool {
-
 	mouseX, mouseY := ebiten.CursorPosition()
 	// check if mouse X is over the image
 	xIsOver := mouseX >= b.X && mouseX <= (b.X+b.Width)

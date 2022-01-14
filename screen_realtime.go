@@ -1,7 +1,6 @@
 package main
 
 import (
-	"context"
 	"fmt"
 	"github.com/ably-labs/rosie-demo/button"
 	colour "github.com/ably-labs/rosie-demo/colours"
@@ -13,11 +12,13 @@ import (
 )
 
 type connectionElements struct {
-	id           connectionID
-	createClient button.Button
-	closeClient  button.Button
-	setChannel   button.Button
-	channelInfo  text.Text
+	id                  connectionID
+	createClient        button.Button
+	closeClient         button.Button
+	setChannel          button.Button
+	channelName         text.Text
+	channelStatus       text.Text
+	channelSubscribeAll button.Button
 }
 
 // The elements of the realtime screen.
@@ -39,14 +40,19 @@ func initialiseRealtimeScreen() {
 	connectionA.createClient = button.NewButton(200, 35, createClientText, 22, 22, colour.Black, font.MplusSmallFont, colour.Yellow, 0, screenHeight/6)
 	connectionA.closeClient = button.NewButton(35, 35, "X", 12, 22, colour.Black, font.MplusSmallFont, colour.Red, (screenWidth/2)-45, screenHeight/6)
 	connectionA.setChannel = button.NewButton(200, 35, setChannelText, 22, 22, colour.Black, font.MplusSmallFont, colour.Yellow, 201, screenHeight/6)
-	connectionA.channelInfo = text.NewText("", colour.Yellow, font.MplusSmallFont, 0, 0)
+	connectionA.channelName = text.NewText("", colour.Yellow, font.MplusSmallFont, 0, 0)
+	connectionA.channelStatus = text.NewText("", colour.White, font.MplusSmallFont, 0, 0)
+	connectionA.channelSubscribeAll = button.NewButton(150, 30, subscribeAllText, 12, 20, colour.Black, font.MplusSmallFont, colour.Yellow, 0, 0)
 
 	//Create Connection B elements
 	connectionB.id = clientB
 	connectionB.createClient = button.NewButton(200, 35, createClientText, 22, 22, colour.Black, font.MplusSmallFont, colour.Yellow, screenWidth/2, screenHeight/6)
 	connectionB.closeClient = button.NewButton(35, 35, "X", 12, 22, colour.Black, font.MplusSmallFont, colour.Red, (screenWidth)-45, screenHeight/6)
 	connectionB.setChannel = button.NewButton(200, 35, setChannelText, 22, 22, colour.Black, font.MplusSmallFont, colour.Yellow, (screenWidth/2)+201, screenHeight/6)
-	connectionB.channelInfo = text.NewText("", colour.Yellow, font.MplusSmallFont, 0, 0)
+	connectionB.channelName = text.NewText("", colour.Yellow, font.MplusSmallFont, 0, 0)
+	connectionB.channelStatus = text.NewText("", colour.White, font.MplusSmallFont, 0, 0)
+	connectionB.channelSubscribeAll = button.NewButton(150, 30, subscribeAllText, 12, 20, colour.Black, font.MplusSmallFont, colour.Yellow, 0, 0)
+
 }
 
 func drawRealtimeScreen(screen *ebiten.Image) {
@@ -54,14 +60,14 @@ func drawRealtimeScreen(screen *ebiten.Image) {
 	infoBar.Draw(screen)
 
 	//Connection A elements
-	drawConnectionElements(screen, connectionA)
+	drawConnectionElements(screen, &connectionA)
 
 	//Connection B elements
-	drawConnectionElements(screen, connectionB)
+	drawConnectionElements(screen, &connectionB)
 }
 
 // drawConnectionElements draws all the elements associated with a connection to the screen.
-func drawConnectionElements(screen *ebiten.Image, elements connectionElements) {
+func drawConnectionElements(screen *ebiten.Image, elements *connectionElements) {
 
 	id := elements.id
 
@@ -81,11 +87,11 @@ func drawConnectionElements(screen *ebiten.Image, elements connectionElements) {
 
 	// if client channel has been created
 	if connections[id] != nil && connections[id].channel != nil {
-		drawChannelInfo(screen, elements.createClient, elements.channelInfo, id)
+		drawChannelInfo(screen, elements.createClient, elements.channelName, elements.channelStatus, &elements.channelSubscribeAll, id)
 	}
 }
 
-func updateRealtimeScreen(ctx context.Context) {
+func updateRealtimeScreen() {
 	if inpututil.IsKeyJustPressed(ebiten.KeyEscape) {
 		state = titleScreen
 	}
@@ -99,6 +105,9 @@ func updateRealtimeScreen(ctx context.Context) {
 	updateSetChannelButton(&connectionA.setChannel, connectionA.id)
 	updateSetChannelButton(&connectionB.setChannel, connectionB.id)
 
+	updateSubscribeChannelButton(&connectionA.channelSubscribeAll, connectionA.id)
+	updateSubscribeChannelButton(&connectionB.channelSubscribeAll, connectionB.id)
+
 }
 
 // drawClientInfo draws a rectangle that is used to display client information.
@@ -110,13 +119,21 @@ func drawClientInfo(screen *ebiten.Image, button button.Button) {
 }
 
 // drawChannelInfo draws channel information, it's location is anchored to an existing button
-func drawChannelInfo(screen *ebiten.Image, button button.Button, text text.Text, id connectionID) {
+func drawChannelInfo(screen *ebiten.Image, button button.Button, channelName text.Text, channelStatus text.Text, channelSubscribeAll *button.Button, id connectionID) {
 	ebitenutil.DrawRect(screen, float64(button.X)+4, (float64(button.Y)+float64(button.Height))+3, (screenWidth/2)-18, screenHeight/24, colour.Yellow)
 	ebitenutil.DrawRect(screen, float64(button.X)+5, (float64(button.Y)+float64(button.Height))+4, (screenWidth/2)-20, (screenHeight/24)-2, colour.Black)
-	text.SetX(button.X + 5)
-	text.SetY((button.Y + button.Height) + 25)
-	text.SetText(fmt.Sprintf("Channel : %s", connections[id].channel.Name))
-	text.Draw(screen)
+	channelName.SetX(button.X + 5)
+	channelName.SetY((button.Y + button.Height) + 25)
+	channelName.SetText(fmt.Sprintf("Channel : %s", connections[id].channel.Name))
+	channelName.Draw(screen)
+	channelStatus.SetX(button.X + 200)
+	channelStatus.SetY((button.Y + button.Height) + 25)
+	channelStatus.SetText(fmt.Sprintf("Status : %s", connections[id].channel.State()))
+	channelStatus.Draw(screen)
+	channelSubscribeAll.SetX(button.X + 400)
+	channelSubscribeAll.SetY((button.Y + button.Height) + 4)
+	channelSubscribeAll.Draw(screen)
+
 }
 
 // updateCreateClientButton contains the update logic for each client creation button.
@@ -127,6 +144,7 @@ func updateCreateClientButton(button *button.Button, id connectionID) {
 		button.SetBgColour(colour.Green)
 	}
 
+	// if the button is not moused over and there is no connection.
 	if !button.IsMouseOver() && connections[id] == nil {
 		button.SetBgColour(colour.Yellow)
 	}
@@ -166,12 +184,56 @@ func updateCloseClientButton(closeButton *button.Button, createButton *button.Bu
 
 // updateSetChannelButton contains the update logic for each set channel button.
 func updateSetChannelButton(button *button.Button, id connectionID) {
+	// Handle mouseover interaction with a set client button
+	if button.IsMouseOver() {
+		button.SetBgColour(colour.Green)
+	} else {
+		button.SetBgColour(colour.Yellow)
+	}
+
 	// Handle mouse click on set channel button
 	if ebiten.IsMouseButtonPressed(ebiten.MouseButtonLeft) && button.IsMouseOver() {
 		// if the connection exists and does not have a channel.
 		if connections[id] != nil && connections[id].channel == nil {
 			setChannel(id)
 			infoBar.SetText(setChannelSuccess)
+		}
+	}
+}
+
+func updateSubscribeChannelButton(button *button.Button, id connectionID) {
+
+	// If a connection exists and no unsubscribeAll function is saved
+	if connections[id] != nil && connections[id].unsubscribeAll == nil {
+		button.SetText(subscribeAllText)
+	}
+
+	// Handle mouseover interaction with subscribe all button while the channel is not subscribed.
+	if button.IsMouseOver() && connections[id] != nil && connections[id].unsubscribeAll == nil {
+		button.SetBgColour(colour.White)
+	}
+
+	// if the button is not moused over and the channel is not subscribed.
+	if !button.IsMouseOver() && connections[id] != nil && connections[id].unsubscribeAll == nil{
+		button.SetBgColour(colour.Yellow)
+	}
+
+	// Handle mouse click on subscribe all button
+	if ebiten.IsMouseButtonPressed(ebiten.MouseButtonLeft) && button.IsMouseOver() {
+		// if a channel exists and the connection has no unsubscribeAll function saved.
+		if connections[id].channel != nil && connections[id].unsubscribeAll == nil {
+
+			unsubscribeAll, err := subscribeAll(id)
+			if err != nil {
+				infoBar.SetText(err.Error())
+			}
+			// Save the unsubscribe all function.
+			connections[id].unsubscribeAll = &unsubscribeAll
+			infoBar.SetText(subscribeAllSuccess)
+
+			// Change the SubscribeAll button into an UnsubscribeAll button.
+			button.SetBgColour(colour.Red)
+			button.SetText(unsubscribeAllText)
 		}
 	}
 }
