@@ -2,7 +2,6 @@ package main
 
 import (
 	"fmt"
-
 	"github.com/ably-labs/rosie-demo/button"
 	colour "github.com/ably-labs/rosie-demo/colours"
 	font "github.com/ably-labs/rosie-demo/fonts"
@@ -341,6 +340,9 @@ func updateAnnouncePresenceButton(button *button.Button, id connectionID) {
 	// the action to get presence is performed on mouse release.
 	if inpututil.IsMouseButtonJustReleased(ebiten.MouseButtonLeft) && button.IsMouseOver() {
 	
-		// announce presence.
+		err := announcePresence(id)
+		if err != nil {
+			infoBar.SetText(err.Error())
+		}
 	}
 }

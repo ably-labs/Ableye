@@ -127,6 +127,19 @@ func printAblyMessage(msg *ably.Message) {
 	fmt.Printf("Received message: name=%s data=%v\n", msg.Name, msg.Data)
 }
 
+// announcePresence announces the presence of a client to a channel.
+func announcePresence(id connectionID) error {
+
+	// Set timeout to be default timeout
+	ctx, _ := context.WithTimeout(connections[id].context, defaultTimeout)
+	err := connections[id].channel.Presence.Enter(ctx, "presence data")
+	if err != nil {
+		log.Println(err)
+		return err
+	}
+	return nil
+}
+
 // getPresence sets the presence info text box to presence information.
 func getPresence(id connectionID, presenceInfo *text.Text) {
 	var buffer bytes.Buffer
@@ -157,4 +170,3 @@ func getPresence(id connectionID, presenceInfo *text.Text) {
 	presenceInfo.SetText(fmt.Sprintf("Presence: %s", presence))
 	log.Println(completeGetPresence)
 }
-

@@ -58,10 +58,20 @@ Once a channel has subscribed to all messages, its state changes from `INITIALIZ
 If the unsubscribe function is then called, the channel state remains `ATTACHED` even though its been unsubscribed.
 I was expecting the state to change to something else as it's no longer attached.
 
-### Documentation
+### Auto Documentation / Code Comments
 
 It looks like the tool tip for `channel.Presence.Get` says `Get returns a list of current members on the channel, attaching the channel first is needed.` However it seems that trying to get presence on a channel which has status `INITIALIZED` will automatically change the channel status to `ATTACHED` so the statement that attaching the channel first might not be true.
 
+### Announce Presence
+Trying to annouce presence using the example code from the readme `err := channel.Presence.Enter(ctx, "presence data")` 
+results in the following error `[ErrorInfo : code=91000 unable to enter presence channel (no clientId) statusCode=0] See https://help.ably.io/error/91000`
+
+Note that following the link in the message `https://help.ably.io/error/91000` no information is available for that error code.
+
+
 ### Get Presence
 It feels like sometimes an async call to get presence returns presence, but sometimes it does not. Could there be a race condition bug here?
+
+### ably-go readme observations
+The example code for announcing presence on a channel using `channel.Presence.Enter`, assigns an error to an existing variable with `=` operator, this should probably change to assign it to a new variable with `:=` operator.
 
