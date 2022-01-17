@@ -7,15 +7,13 @@ import (
 )
 
 // The elements of the rest screen.
-var (
-
-)
+var ()
 
 func drawRestScreen(screen *ebiten.Image) {
 	ebitenutil.DebugPrintAt(screen, "Ably Rest", 0, 0)
 }
 
-func updateRestScreen(){
+func updateRestScreen() {
 	if inpututil.IsKeyJustPressed(ebiten.KeyEscape) {
 		state = titleScreen
 	}

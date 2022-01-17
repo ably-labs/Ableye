@@ -24,7 +24,7 @@ func init() {
 		log.Fatal(err.Error())
 	}
 
-	if Cfg.Key == ""{
+	if Cfg.Key == "" {
 		log.Fatal("ABLY_PRIVATE_KEY not found. Environment variable must be set.")
 	}
 }

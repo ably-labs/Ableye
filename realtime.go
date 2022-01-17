@@ -167,3 +167,17 @@ func getPresence(id connectionID, presenceInfo *text.Text) {
 	presenceInfo.SetText(fmt.Sprintf("Presence : %s", presence))
 	log.Println(completeGetPresence)
 }
+
+// leavePresence removes the presence of a client from a channel.
+func leavePresence(id connectionID) error {
+
+	// Set timeout to be default timeout
+	ctx, _ := context.WithTimeout(connections[id].context, defaultTimeout)
+	err := connections[id].channel.Presence.Leave(ctx, nil)
+	if err != nil {
+		log.Println(err)
+		return err
+	}
+	log.Println(leavePresenceSuccess)
+	return nil
+}

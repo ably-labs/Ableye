@@ -17,7 +17,7 @@ func init() {
 	state = titleScreen
 }
 
-type Game struct {}
+type Game struct{}
 
 // NewGame is a constructor for the game.
 func NewGame() *Game {

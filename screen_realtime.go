@@ -20,8 +20,9 @@ type connectionElements struct {
 	channelStatus       text.Text
 	channelSubscribeAll button.Button
 	presenceInfo        text.Text
-	announcePresence 	button.Button
+	announcePresence    button.Button
 	getPresence         button.Button
+	leavePresence       button.Button
 }
 
 // The elements of the realtime screen.
@@ -48,7 +49,8 @@ func initialiseRealtimeScreen() {
 	connectionA.channelSubscribeAll = button.NewButton(125, 30, subscribeAllText, 12, 20, colour.Black, font.MplusSmallFont, colour.Yellow, 0, 0)
 	connectionA.presenceInfo = text.NewText("", colour.Cyan, font.MplusSmallFont, 0, 0)
 	connectionA.announcePresence = button.NewButton(100, 30, announcePresenceText, 12, 20, colour.Black, font.MplusSmallFont, colour.Cyan, 0, 0)
-	connectionA.getPresence = button.NewButton(100, 30, getPresenceText, 32, 20, colour.Black, font.MplusSmallFont, colour.Cyan, 0, 0)
+	connectionA.getPresence = button.NewButton(50, 30, getPresenceText, 12, 20, colour.Black, font.MplusSmallFont, colour.Cyan, 0, 0)
+	connectionA.leavePresence = button.NewButton(70, 30, leavePresenceText, 12, 20, colour.Black, font.MplusSmallFont, colour.Cyan, 0, 0)
 
 	//Create Connection B elements
 	connectionB.id = clientB
@@ -60,7 +62,8 @@ func initialiseRealtimeScreen() {
 	connectionB.channelSubscribeAll = button.NewButton(125, 30, subscribeAllText, 12, 20, colour.Black, font.MplusSmallFont, colour.Yellow, 0, 0)
 	connectionB.presenceInfo = text.NewText("", colour.Cyan, font.MplusSmallFont, 0, 0)
 	connectionB.announcePresence = button.NewButton(100, 30, announcePresenceText, 12, 20, colour.Black, font.MplusSmallFont, colour.Cyan, 0, 0)
-	connectionB.getPresence = button.NewButton(100, 30, getPresenceText, 32, 20, colour.Black, font.MplusSmallFont, colour.Cyan, 0, 0)
+	connectionB.getPresence = button.NewButton(50, 30, getPresenceText, 12, 20, colour.Black, font.MplusSmallFont, colour.Cyan, 0, 0)
+	connectionB.leavePresence = button.NewButton(70, 30, leavePresenceText, 12, 20, colour.Black, font.MplusSmallFont, colour.Cyan, 0, 0)
 
 }
 
@@ -123,6 +126,9 @@ func updateRealtimeScreen() {
 	updateGetPresenceButton(&connectionA.getPresence, &connectionA.presenceInfo, connectionA.id)
 	updateGetPresenceButton(&connectionB.getPresence, &connectionB.presenceInfo, connectionB.id)
 
+	updateLeavePresenceButton(&connectionA.leavePresence, connectionA.id)
+	updateLeavePresenceButton(&connectionB.leavePresence, connectionB.id)
+
 }
 
 // drawClientInfo draws a rectangle that is used to display client information.
@@ -176,14 +182,20 @@ func drawChannelInfo(screen *ebiten.Image, elements *connectionElements) {
 	elements.presenceInfo.Draw(screen)
 
 	// announce presence button
-	elements.announcePresence.SetX(button.X + 464)
+	elements.announcePresence.SetX(button.X + 442)
 	elements.announcePresence.SetY(button.Y + button.Height + 43)
 	elements.announcePresence.Draw(screen)
 
 	// get presence button
-	elements.getPresence.SetX(button.X + 565)
+	elements.getPresence.SetX(button.X + 543)
 	elements.getPresence.SetY(button.Y + button.Height + 43)
 	elements.getPresence.Draw(screen)
+
+	// leave presence button
+	elements.leavePresence.SetX(button.X + 594)
+	elements.leavePresence.SetY(button.Y + button.Height + 43)
+	elements.leavePresence.Draw(screen)
+
 }
 
 // updateCreateClientButton contains the update logic for each client creation button.
@@ -308,6 +320,29 @@ func updateSubscribeChannelButton(button *button.Button, id connectionID) {
 	}
 }
 
+// updateGetPresenceButton contains the update logic for each announce presence button.
+func updateAnnouncePresenceButton(button *button.Button, id connectionID) {
+	// Handle mouseover interaction with an announce presence button.
+	if button.IsMouseOver() {
+		button.SetBgColour(colour.White)
+	} else {
+		button.SetBgColour(colour.Cyan)
+	}
+
+	// Handle mouse click on announce presence button.
+	// As this button has no conditional to prevent its action triggering on every frame,
+	// the action to announce presence is performed on mouse release.
+	if inpututil.IsMouseButtonJustReleased(ebiten.MouseButtonLeft) && button.IsMouseOver() {
+
+		err := announcePresence(id)
+		if err != nil {
+			infoBar.SetText(err.Error())
+			return
+		}
+		infoBar.SetText(announcePresenceSuccess)
+	}
+}
+
 // updateGetPresenceButton contains the update logic for each get presence button
 func updateGetPresenceButton(button *button.Button, text *text.Text, id connectionID) {
 	// Handle mouseover interaction with a get presence button.
@@ -326,25 +361,24 @@ func updateGetPresenceButton(button *button.Button, text *text.Text, id connecti
 	}
 }
 
-// updateGetPresenceButton contains the update logic for each get presence button.
-func updateAnnouncePresenceButton(button *button.Button, id connectionID) {
-	// Handle mouseover interaction with an announce presence button.
+// updateLeavePresenceButton contains the update logic for each leave presence button.
+func updateLeavePresenceButton(button *button.Button, id connectionID) {
+	// Handle mouseover interaction with a leave presence button.
 	if button.IsMouseOver() {
 		button.SetBgColour(colour.White)
 	} else {
 		button.SetBgColour(colour.Cyan)
 	}
 
-	// Handle mouse click on get presence button.
+	// Handle mouse click on leave presence button.
 	// As this button has no conditional to prevent its action triggering on every frame,
-	// the action to get presence is performed on mouse release.
+	// the action to leave presence is performed on mouse release.
 	if inpututil.IsMouseButtonJustReleased(ebiten.MouseButtonLeft) && button.IsMouseOver() {
-	
-		err := announcePresence(id)
+		err := leavePresence(id)
 		if err != nil {
 			infoBar.SetText(err.Error())
 			return
 		}
-		infoBar.SetText(announcePresenceSuccess)
+		infoBar.SetText(leavePresenceSuccess)
 	}
 }

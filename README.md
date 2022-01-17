@@ -17,11 +17,12 @@ Completed:
 * Can set a default channel for a realtime client
 * Can subscribe to all messages on a channel
 * Can unsubscribe from all messages on a channel
-* Can get channel presence information
+* Can set channel presence 
+* Can get channel presence 
+* Can remove channel presence (leave)
 
 TODO:
 
-* Set channel presence information
 * Publish a message to a channel
 * Display messages received on a channel
 * Add some nice graphics
@@ -68,7 +69,7 @@ results in the following error `[ErrorInfo : code=91000 unable to enter presence
 
 Note that following the link in the message `https://help.ably.io/error/91000` is a dead link with no information is available for that error code.
 
-It looks like there is a silent failure the first time a client announces presence on an channel, however announcing presence on a channel a second time always seems to work.
+Most of the time, the first time a client announces presence with `presence.Enter` it silently fails. Only on rare occasions does announcing work the first time the client announces. However, announcing always seems to work the second time the client announces. This should be investigated further.
 
 ### Get Presence
 It feels like sometimes an async call to get presence returns presence, but sometimes it does not. Could there be a race condition bug here?

@@ -9,6 +9,7 @@ var (
 	subscribeAllSuccess         = "Successfully subscribed to all channel messages."
 	unsubscribeAllSuccess       = "Successfully unsubscribed from all channel messages."
 	announcePresenceSuccess     = "Successfully announced presence."
+	leavePresenceSuccess        = "Successfully removed presence."
 
 	// Button text
 	createClientText     = "Create Client"
@@ -17,6 +18,7 @@ var (
 	unsubscribeAllText   = "Unsubscribe"
 	announcePresenceText = "Announce"
 	getPresenceText      = "Get"
+	leavePresenceText    = "Leave"
 
 	// Async processes
 	startGetPresence    = "go routine started to get presence."

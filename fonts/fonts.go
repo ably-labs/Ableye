@@ -1,19 +1,19 @@
 package fonts
 
-import(
-	"log"
-	"golang.org/x/image/font"
+import (
 	"github.com/golang/freetype/truetype"
 	"github.com/hajimehoshi/ebiten/examples/resources/fonts"
+	"golang.org/x/image/font"
+	"log"
 )
 
-const(
+const (
 	fontDpi = 72
 )
 
 var (
 	MplusNormalFont font.Face
-	MplusSmallFont font.Face
+	MplusSmallFont  font.Face
 )
 
 func init() {
