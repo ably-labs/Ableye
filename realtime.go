@@ -48,7 +48,6 @@ type connection struct {
 	context        context.Context
 	client         *ably.Realtime
 	channel        *ably.RealtimeChannel
-	presence       []*ably.PresenceMessage
 	unsubscribeAll *func()
 }
 
@@ -62,9 +61,14 @@ func newConnection(client *ably.Realtime) connection {
 }
 
 // createRealtimeClient creates a new realtime client and stores it in a connection.
+// A clientID is also set on the client.
 func createRealtimeClient(id connectionID) error {
 
-	newClient, err := ably.NewRealtime(ably.WithKey(config.Cfg.Key))
+	newClient, err := ably.NewRealtime(
+		ably.WithKey(config.Cfg.Key),
+		ably.WithClientID(id.string()),
+	)
+
 	if err != nil {
 		return err
 	}
@@ -132,11 +136,12 @@ func announcePresence(id connectionID) error {
 
 	// Set timeout to be default timeout
 	ctx, _ := context.WithTimeout(connections[id].context, defaultTimeout)
-	err := connections[id].channel.Presence.Enter(ctx, "presence data")
+	err := connections[id].channel.Presence.Enter(ctx, nil)
 	if err != nil {
 		log.Println(err)
 		return err
 	}
+	log.Println(announcePresenceSuccess)
 	return nil
 }
 
@@ -153,20 +158,12 @@ func getPresence(id connectionID, presenceInfo *text.Text) {
 
 	for _, v := range presenceMessages {
 		if v != nil {
-			buffer.WriteString(v.ID)
-			buffer.WriteString(" ")
-			buffer.WriteString(v.ConnectionID)
-			buffer.WriteString(" ")
-			buffer.WriteString(v.Name)
-			buffer.WriteString(" ")
 			buffer.WriteString(v.ClientID)
-			buffer.WriteString(" ")
-			buffer.WriteString(v.Message.String())
 			buffer.WriteString(" ")
 		}
 	}
 	presence := buffer.String()
 
-	presenceInfo.SetText(fmt.Sprintf("Presence: %s", presence))
+	presenceInfo.SetText(fmt.Sprintf("Presence : %s", presence))
 	log.Println(completeGetPresence)
 }

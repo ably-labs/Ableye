@@ -343,6 +343,8 @@ func updateAnnouncePresenceButton(button *button.Button, id connectionID) {
 		err := announcePresence(id)
 		if err != nil {
 			infoBar.SetText(err.Error())
+			return
 		}
+		infoBar.SetText(announcePresenceSuccess)
 	}
 }
