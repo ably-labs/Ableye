@@ -131,6 +131,8 @@ func printAblyMessage(msg *ably.Message) {
 func getPresence(id connectionID, presenceInfo *text.Text) {
 	var buffer bytes.Buffer
 
+	log.Println(startGetPresence)
+
 	// Set timeout to be default timeout
 	ctx, _ := context.WithTimeout(connections[id].context, defaultTimeout)
 
@@ -152,6 +154,7 @@ func getPresence(id connectionID, presenceInfo *text.Text) {
 	}
 	presence := buffer.String()
 
-	presenceInfo.SetText(fmt.Sprintf("presence is: %s", presence))
+	presenceInfo.SetText(fmt.Sprintf("Presence: %s", presence))
+	log.Println(completeGetPresence)
 }
 

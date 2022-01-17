@@ -13,6 +13,11 @@ var (
 	createClientText   = "Create Client"
 	setChannelText     = "Set Channel"
 	subscribeAllText   = "Subscribe All"
-	unsubscribeAllText = "Unsubscribe All"
-	getPresenceText    = "Get Presence"
+	unsubscribeAllText = "Unsubscribe"
+	announcePresenceText   = "Announce"
+	getPresenceText    = "Get"
+
+	// Async processes
+	startGetPresence    = "go routine started to get presence."
+	completeGetPresence = "go routine completed to get presence."
 )
