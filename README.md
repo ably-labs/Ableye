@@ -17,12 +17,13 @@ Completed:
 * Can set a default channel for a realtime client
 * Can subscribe to all messages on a channel
 * Can unsubscribe from all messages on a channel
+* Can get channel presence information
 
 TODO:
 
-* Publish to a channel
+* Set channel presence information
+* Publish a message to a channel
 * Display messages received on a channel
-* Display channel presence information
 * Add some nice graphics
 
 ## Setup 
@@ -31,7 +32,7 @@ If you don't have one already, [create a new Ably account](https://ably.com/sign
 Create a new environment variable called `ABLY_PRIVATE_KEY` and set it to your Ably private key.
 
 
-## Things to investigate in the SDK.
+## Things to investigate further in the SDK.
 
 ### Missing pointer safety
 When attempting to create a new client and passing nil to the constructor for a new realtime client 
@@ -57,4 +58,10 @@ Once a channel has subscribed to all messages, its state changes from `INITIALIZ
 If the unsubscribe function is then called, the channel state remains `ATTACHED` even though its been unsubscribed.
 I was expecting the state to change to something else as it's no longer attached.
 
+### Documentation
+
+It looks like the tool tip for `channel.Presence.Get` says `Get returns a list of current members on the channel, attaching the channel first is needed.` However it seems that trying to get presence on a channel which has status `INITIALIZED` will automatically change the channel status to `ATTACHED` so the statement that attaching the channel first might not be true.
+
+### Get Presence
+It feels like sometimes an async call to get presence returns presence, but sometimes it does not. Could there be a race condition bug here?
 

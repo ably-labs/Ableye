@@ -1,11 +1,14 @@
 package main
 
 import (
+	"bytes"
 	"context"
 	"fmt"
-	"github.com/ably-labs/rosie-demo/config"
-	ably "github.com/ably/ably-go/ably"
 	"log"
+
+	"github.com/ably-labs/rosie-demo/config"
+	"github.com/ably-labs/rosie-demo/text"
+	ably "github.com/ably/ably-go/ably"
 )
 
 func init() {
@@ -124,20 +127,31 @@ func printAblyMessage(msg *ably.Message) {
 	fmt.Printf("Received message: name=%s data=%v\n", msg.Name, msg.Data)
 }
 
-// func getPresence(id connectionID) (*string, error) {
-// 	var buffer bytes.Buffer
-// 	presenceMessages, err := connections[id].channel.Presence.Get(connections[id].context)
-// 	if err != nil {
-// 		return nil, err
-// 	}
+// getPresence sets the presence info text box to presence information.
+func getPresence(id connectionID, presenceInfo *text.Text) {
+	var buffer bytes.Buffer
 
-// 	for i := range presenceMessages {
-// 		buffer.WriteString(presenceMessages[i].Name)
-// 		fmt.Println("writing to presence")
-// 		fmt.Println(presenceMessages[i].Name)
-// 		buffer.WriteString(" ")
-// 	}
-// 	presence := buffer.String()
-// 	return &presence, nil
-// }
+	// Set timeout to be default timeout
+	ctx, _ := context.WithTimeout(connections[id].context, defaultTimeout)
+
+	presenceMessages, _ := connections[id].channel.Presence.Get(ctx)
+
+	for _, v := range presenceMessages {
+		if v != nil {
+			buffer.WriteString(v.ID)
+			buffer.WriteString(" ")
+			buffer.WriteString(v.ConnectionID)
+			buffer.WriteString(" ")
+			buffer.WriteString(v.Name)
+			buffer.WriteString(" ")
+			buffer.WriteString(v.ClientID)
+			buffer.WriteString(" ")
+			buffer.WriteString(v.Message.String())
+			buffer.WriteString(" ")
+		}
+	}
+	presence := buffer.String()
+
+	presenceInfo.SetText(fmt.Sprintf("presence is: %s", presence))
+}
 

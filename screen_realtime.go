@@ -22,7 +22,6 @@ type connectionElements struct {
 	channelSubscribeAll button.Button
 	presenceInfo        text.Text
 	getPresence 	button.Button
-
 }
 
 // The elements of the realtime screen.
@@ -117,6 +116,10 @@ func updateRealtimeScreen() {
 	updateSubscribeChannelButton(&connectionA.channelSubscribeAll, connectionA.id)
 	updateSubscribeChannelButton(&connectionB.channelSubscribeAll, connectionB.id)
 
+	updateGetPresenceButton(&connectionA.getPresence, &connectionA.presenceInfo, connectionA.id)
+	updateGetPresenceButton(&connectionB.getPresence, &connectionB.presenceInfo, connectionB.id)
+	
+
 }
 
 // drawClientInfo draws a rectangle that is used to display client information.
@@ -133,31 +136,37 @@ func drawChannelInfo(screen *ebiten.Image, elements *connectionElements) {
 	button := elements.createClient
 	id := elements.id
 
+	// channel area
 	ebitenutil.DrawRect(screen, float64(button.X)+4, (float64(button.Y)+float64(button.Height))+3, (screenWidth/2)-18, screenHeight/10, colour.Yellow)
 	ebitenutil.DrawRect(screen, float64(button.X)+5, (float64(button.Y)+float64(button.Height))+4, (screenWidth/2)-20, (screenHeight/10)-2, colour.Black)
+	
+	// channel name text box
 	elements.channelName.SetX(button.X + 10)
 	elements.channelName.SetY((button.Y + button.Height) + 25)
 	elements.channelName.SetText(fmt.Sprintf("Channel : %s", connections[id].channel.Name))
 	elements.channelName.Draw(screen)
 
+	// channel status text box
 	elements.channelStatus.SetX(button.X + 200)
 	elements.channelStatus.SetY((button.Y + button.Height) + 25)
 	elements.channelStatus.SetText(fmt.Sprintf("Status : %s", connections[id].channel.State()))
 	elements.channelStatus.Draw(screen)
 
+	// channel subscribe all button
 	elements.channelSubscribeAll.SetX(button.X + 400)
 	elements.channelSubscribeAll.SetY((button.Y + button.Height) + 4)
 	elements.channelSubscribeAll.Draw(screen)
 
-	// draw presense info
+	// presence area
 	ebitenutil.DrawRect(screen, float64(button.X)+8, (float64(button.Y)+float64(button.Height))+42, (screenWidth/2)-26, screenHeight/24, colour.Cyan)
 	ebitenutil.DrawRect(screen, float64(button.X)+9, (float64(button.Y)+float64(button.Height))+43, (screenWidth/2)-28, (screenHeight/24)-2, colour.Black)
 
+	// presence info text box
 	elements.presenceInfo.SetX(button.X + 12)
 	elements.presenceInfo.SetY(button.Y + button.Height + 62)
-	elements.presenceInfo.SetText(fmt.Sprintf("Presence : %s", "foo"))
 	elements.presenceInfo.Draw(screen)
 
+	// get presence button
 	elements.getPresence.SetX(button.X + 400)
 	elements.getPresence.SetY(button.Y + button.Height + 43)
 	elements.getPresence.Draw(screen)
@@ -277,3 +286,21 @@ func updateSubscribeChannelButton(button *button.Button, id connectionID) {
 	}
 }
 
+// updateGetPresenceButton contains the update logic for each get presence button
+func updateGetPresenceButton(button *button.Button, text *text.Text, id connectionID) {
+	// Handle mouseover interaction with a get presence button
+	if button.IsMouseOver() {
+		button.SetBgColour(colour.White)
+	} else {
+		button.SetBgColour(colour.Cyan)
+	}
+
+
+	// Handle mouse click on get presence button
+	// as this button has no conditional to prevent its action triggering on every frame,
+	// the action to get presence is performed on mouse release
+	if inpututil.IsMouseButtonJustReleased(ebiten.MouseButtonLeft) && button.IsMouseOver() {
+		// the call to get presence is async to prevent blocking.
+	 	go getPresence(id, text)
+	}
+}
