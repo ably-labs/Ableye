@@ -45,10 +45,10 @@ const (
 
 // connection represents a connection to the Ably platform.
 type connection struct {
-	context        context.Context
-	client         *ably.Realtime
-	channel        *ably.RealtimeChannel
-	unsubscribeAll *func()
+	context     context.Context
+	client      *ably.Realtime
+	channel     *ably.RealtimeChannel
+	unsubscribe *func()
 }
 
 // newConnection is a contructor to create a new connection.
@@ -87,7 +87,7 @@ func closeRealtimeClient(id connectionID) {
 		connections[id].client.Close()
 
 		//Tear down the connection in internal memory.
-		connections[id].unsubscribeAll = nil
+		connections[id].unsubscribe = nil
 		connections[id] = nil
 
 		log.Println(closeRealtimeClientSuccess)
@@ -102,8 +102,11 @@ func setChannel(id connectionID) {
 }
 
 // subscribeAll subscribes the connection's channel to all messsages.
-func subscribeAll(id connectionID) (func(), error) {
-	unsubscribe, err := connections[id].channel.SubscribeAll(connections[id].context, printAblyMessage)
+// once subscribe events are output to the eventInfo text box
+func subscribeAll(id connectionID, eventInfo *text.Text) (func(), error) {
+
+	handlerFunc := newEventHandler(eventInfo)
+	unsubscribe, err := connections[id].channel.SubscribeAll(connections[id].context, handlerFunc)
 
 	if err != nil {
 		return nil, err
@@ -112,23 +115,39 @@ func subscribeAll(id connectionID) (func(), error) {
 	return unsubscribe, nil
 }
 
-// unsubscribeAll calls a connections unsubscribe all function if it exists.
-func unsubscribeAll(id connectionID) {
-	if connections[id].unsubscribeAll != nil {
-		unsubscribeFunc := *connections[id].unsubscribeAll
+//newEventHandler returns a function that can handle a message event.
+//This pattern allows dependencies to be injected into the handler function.
+func newEventHandler(eventInfo *text.Text) func(*ably.Message) {
+	return func(msg *ably.Message) {
+		log.Printf("Received message: name=%s data=%v\n", msg.Name, msg.Data)
+		if eventInfo != nil {
+			eventInfo.SetText(fmt.Sprintf("Event : %s , %v", msg.Name, msg.Data))
+		}
+	}
+}
+
+// unsubscribe calls a connections unsubscribe function if it exists.
+func unsubscribe(id connectionID) {
+	if connections[id].unsubscribe != nil {
+		unsubscribeFunc := *connections[id].unsubscribe
 		unsubscribeFunc()
-		log.Println(unsubscribeAllSuccess)
+		log.Println(unsubscribeSuccess)
 	}
 
 }
 
-// func publishToChannel(ctx context.Context) error {
-// 	//return channel.Publish(ctx, "EventName1", "EventData1")
-// 	return nil
-// }
+func publishToChannel(id connectionID) error {
 
-func printAblyMessage(msg *ably.Message) {
-	fmt.Printf("Received message: name=%s data=%v\n", msg.Name, msg.Data)
+	// Set timeout to be default timeout
+	ctx, _ := context.WithTimeout(connections[id].context, defaultTimeout)
+
+	eventName := fmt.Sprintf("Message from %s", id.string())
+	eventData := "This is some event data"
+	if err := connections[id].channel.Publish(ctx, eventName, eventData); err != nil {
+		return err
+	}
+	log.Println(publishToChannelSuccess)
+	return nil
 }
 
 // announcePresence announces the presence of a client to a channel.
@@ -156,10 +175,13 @@ func getPresence(id connectionID, presenceInfo *text.Text) {
 
 	presenceMessages, _ := connections[id].channel.Presence.Get(ctx)
 
-	for _, v := range presenceMessages {
+	for i, v := range presenceMessages {
 		if v != nil {
 			buffer.WriteString(v.ClientID)
-			buffer.WriteString(" ")
+			// if not the last message, add a comma and a space.
+			if i != len(presenceMessages)-1 {
+				buffer.WriteString(", ")
+			}
 		}
 	}
 	presence := buffer.String()

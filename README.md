@@ -15,16 +15,18 @@ Completed:
 * Can create realtime clients
 * Can close realtime clients
 * Can set a default channel for a realtime client
-* Can subscribe to all messages on a channel
-* Can unsubscribe from all messages on a channel
-* Can set channel presence 
-* Can get channel presence 
-* Can remove channel presence (leave)
+* Clients can subscribe to all messages on a channel
+* Clients can unsubscribe from all messages on a channel
+* Clients can announce their channel presence 
+* Clients can get channel presence 
+* Clients can remove channel presence (leave)
+* Clients can publish a message to a channel
+* Clients can display messages received on a channel
 
 TODO:
 
-* Publish a message to a channel
-* Display messages received on a channel
+* Give clients a way to change the data that they publish to a channel
+* increase the number of connections that can be created from 2 to 4
 * Add some nice graphics
 
 ## Setup 
