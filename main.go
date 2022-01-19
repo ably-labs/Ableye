@@ -33,8 +33,6 @@ func (g *Game) Update() error {
 		updateTitleScreen()
 	case realtimeScreen:
 		updateRealtimeScreen()
-	case restScreen:
-		updateRestScreen()
 	}
 
 	return nil
@@ -54,8 +52,6 @@ func (g *Game) Draw(screen *ebiten.Image) {
 		drawTitleScreen(screen)
 	case realtimeScreen:
 		drawRealtimeScreen(screen)
-	case restScreen:
-		drawRestScreen(screen)
 	}
 }
 

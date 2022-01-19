@@ -26,6 +26,7 @@ Completed:
 
 TODO:
 
+* Currently crashes when creating channel with name "", handle this gracefully.
 * Give clients a way to change the data that they publish to a channel
 * Increase the number of connections that can be created from 2 to 4
 * Replicate functionality for the realtime client for the rest client
@@ -88,3 +89,4 @@ The example code for announcing presence on a channel using `channel.Presence.En
 * The `Encoding` field appears to always be empty
 * The `ID` field appears to always be empty
 * The `Extras` field appears to always be sent as an empty slice of map.
+
