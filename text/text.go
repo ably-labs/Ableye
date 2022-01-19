@@ -34,9 +34,16 @@ func (t *Text) SetX(x int) {
 	t.X = x
 }
 
-// SetYis used to change the Y location of the text string.
+// SetY is used to change the Y location of the text string.
 func (t *Text) SetY(y int) {
 	t.Y = y
+}
+
+// Reset is used to move the text box to 0,0 and delete it's text.
+func (t *Text) Reset() {
+	t.X = 0
+	t.Y = 0
+	t.text = ""
 }
 
 // NewText is a contructor that creates new text.

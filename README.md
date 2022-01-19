@@ -26,7 +26,9 @@ Completed:
 TODO:
 
 * Give clients a way to change the data that they publish to a channel
-* increase the number of connections that can be created from 2 to 4
+* Increase the number of connections that can be created from 2 to 4
+* Replicate functionality for the realtime client for the rest client
+* Display the SDK version on the title screen
 * Add some nice graphics
 
 ## Setup 
@@ -79,3 +81,9 @@ It feels like sometimes an async call to get presence returns presence, but some
 ### ably-go readme observations
 The example code for announcing presence on a channel using `channel.Presence.Enter`, assigns an error to an existing variable with `=` operator, this should probably change to assign it to a new variable with `:=` operator. This information should also be update to say that to use this method, a clientID must be set on the client.
 
+### missing message fields
+* Ably messages have a field called `Timestamp` of type `int64`. It appears that once a message is received, it's timestamp is always `0`. Was expecting the timestamp to not have a nil value. Was also expecting this to be of type `time.Time`. 
+* The `ConnectionID` field appears to always be empty
+* The `Encoding` field appears to always be empty
+* The `ID` field appears to always be empty
+* The `Extras` field appears to always be sent as an empty slice of map.

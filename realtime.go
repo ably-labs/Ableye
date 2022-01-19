@@ -121,7 +121,7 @@ func newEventHandler(eventInfo *text.Text) func(*ably.Message) {
 	return func(msg *ably.Message) {
 		log.Printf("Received message: name=%s data=%v\n", msg.Name, msg.Data)
 		if eventInfo != nil {
-			eventInfo.SetText(fmt.Sprintf("Event : %s , %v", msg.Name, msg.Data))
+			eventInfo.SetText(fmt.Sprintf("Event : %s, %s, %s,", msg.ClientID, msg.Name, msg.Data))
 		}
 	}
 }
@@ -139,11 +139,10 @@ func unsubscribe(id connectionID) {
 func publishToChannel(id connectionID) error {
 
 	// Set timeout to be default timeout
-	ctx, _ := context.WithTimeout(connections[id].context, defaultTimeout)
+	ctx, cancel := context.WithTimeout(connections[id].context, defaultTimeout)
+	defer cancel()
 
-	eventName := fmt.Sprintf("Message from %s", id.string())
-	eventData := "This is some event data"
-	if err := connections[id].channel.Publish(ctx, eventName, eventData); err != nil {
+	if err := connections[id].channel.Publish(ctx, "Event Name", "Event Data"); err != nil {
 		return err
 	}
 	log.Println(publishToChannelSuccess)
@@ -154,7 +153,9 @@ func publishToChannel(id connectionID) error {
 func announcePresence(id connectionID) error {
 
 	// Set timeout to be default timeout
-	ctx, _ := context.WithTimeout(connections[id].context, defaultTimeout)
+	ctx, cancel := context.WithTimeout(connections[id].context, defaultTimeout)
+	defer cancel()
+
 	err := connections[id].channel.Presence.Enter(ctx, nil)
 	if err != nil {
 		log.Println(err)
@@ -171,7 +172,8 @@ func getPresence(id connectionID, presenceInfo *text.Text) {
 	log.Println(startGetPresence)
 
 	// Set timeout to be default timeout
-	ctx, _ := context.WithTimeout(connections[id].context, defaultTimeout)
+	ctx, cancel := context.WithTimeout(connections[id].context, defaultTimeout)
+	defer cancel()
 
 	presenceMessages, _ := connections[id].channel.Presence.Get(ctx)
 
@@ -194,7 +196,9 @@ func getPresence(id connectionID, presenceInfo *text.Text) {
 func leavePresence(id connectionID) error {
 
 	// Set timeout to be default timeout
-	ctx, _ := context.WithTimeout(connections[id].context, defaultTimeout)
+	ctx, cancel := context.WithTimeout(connections[id].context, defaultTimeout)
+	defer cancel()
+
 	err := connections[id].channel.Presence.Leave(ctx, nil)
 	if err != nil {
 		log.Println(err)

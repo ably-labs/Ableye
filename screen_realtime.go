@@ -281,17 +281,10 @@ func updateCloseClientButton(closeButton *button.Button, createButton *button.Bu
 		createButton.SetText(createClientText)
 
 		// Reset the presence text once a client is closed.
-		// Return it to its initialised location.
-		// Set its text to its initialised text.
-		presenceInfo.SetX(0)
-		presenceInfo.SetY(0)
-		presenceInfo.SetText("")
+		presenceInfo.Reset()
 
 		// Reset the eventInfo text
-		eventInfo.SetX(0)
-		eventInfo.SetY(0)
-		eventInfo.SetText("")
-
+		eventInfo.Reset()
 	}
 }
 
@@ -384,9 +377,7 @@ func updateSubscribeChannelButton(button *button.Button, eventInfo *text.Text, i
 			infoBar.SetText(unsubscribeSuccess)
 			// tear down channel unsubcribe function
 			connections[id].unsubscribe = nil
-			eventInfo.SetX(0)
-			eventInfo.SetY(0)
-			eventInfo.SetText("")
+			eventInfo.Reset()
 
 			return
 		}
@@ -455,4 +446,3 @@ func updateLeavePresenceButton(button *button.Button, id connectionID) {
 		infoBar.SetText(leavePresenceSuccess)
 	}
 }
-
