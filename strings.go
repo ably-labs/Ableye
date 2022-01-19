@@ -22,6 +22,10 @@ var (
 	getPresenceText      = "Get"
 	leavePresenceText    = "Leave"
 
+	// Display text
+	inputsText      = "Inputs"
+	channelNameText = "Channel Name"
+
 	// Async processes
 	startGetPresence    = "go routine started to get presence."
 	completeGetPresence = "go routine completed to get presence."

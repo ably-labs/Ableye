@@ -94,9 +94,9 @@ func closeRealtimeClient(id connectionID) {
 	}
 }
 
-// setChannel sets the channel to the default channel for a connection.
-func setChannel(id connectionID) {
-	newChannel := connections[id].client.Channels.Get(defaultChannel)
+// setChannel sets the channel to the name provided in the channel name input text box.
+func setChannel(name string, id connectionID) {
+	newChannel := connections[id].client.Channels.Get(name)
 	connections[id].channel = newChannel
 	log.Println(setChannelSuccess)
 }

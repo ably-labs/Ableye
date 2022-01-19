@@ -22,6 +22,7 @@ Completed:
 * Clients can remove channel presence (leave)
 * Clients can publish a message to a channel
 * Clients can display messages received on a channel
+* Clients can change the name of the channel
 
 TODO:
 

@@ -2,29 +2,34 @@ package main
 
 import (
 	"fmt"
+
 	"github.com/ably-labs/rosie-demo/button"
 	colour "github.com/ably-labs/rosie-demo/colours"
 	font "github.com/ably-labs/rosie-demo/fonts"
 	"github.com/ably-labs/rosie-demo/text"
+	"github.com/ably-labs/rosie-demo/textbox"
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/hajimehoshi/ebiten/v2/ebitenutil"
 	"github.com/hajimehoshi/ebiten/v2/inpututil"
 )
 
 type connectionElements struct {
-	id                  connectionID
-	createClient        button.Button
-	closeClient         button.Button
-	setChannel          button.Button
-	channelName         text.Text
-	channelStatus       text.Text
-	channelPublish      button.Button
-	channelSubscribeAll button.Button
-	presenceInfo        text.Text
-	announcePresence    button.Button
-	getPresence         button.Button
-	leavePresence       button.Button
-	eventInfo           text.Text
+	id                    connectionID
+	createClient          button.Button
+	closeClient           button.Button
+	setChannel            button.Button
+	channelName           text.Text
+	channelStatus         text.Text
+	channelPublish        button.Button
+	channelSubscribeAll   button.Button
+	presenceInfo          text.Text
+	announcePresence      button.Button
+	getPresence           button.Button
+	leavePresence         button.Button
+	eventInfo             text.Text
+	inputsLabel           text.Text
+	inputChannelNameLabel text.Text
+	inputChannelName      textbox.TextBox
 }
 
 // The elements of the realtime screen.
@@ -55,6 +60,9 @@ func initialiseRealtimeScreen() {
 	connectionA.getPresence = button.NewButton(50, 30, getPresenceText, 12, 20, colour.Black, font.MplusSmallFont, colour.Cyan, 0, 0)
 	connectionA.leavePresence = button.NewButton(70, 30, leavePresenceText, 12, 20, colour.Black, font.MplusSmallFont, colour.Cyan, 0, 0)
 	connectionA.eventInfo = text.NewText("", colour.White, font.MplusSmallFont, 0, 0)
+	connectionA.inputsLabel = text.NewText(fmt.Sprintf("%s :", inputsText), colour.Green, font.MplusSmallFont, 0, 0)
+	connectionA.inputChannelNameLabel = text.NewText(fmt.Sprintf("%s :", channelNameText), colour.Green, font.MplusSmallFont, 0, 0)
+	connectionA.inputChannelName = textbox.NewTextBox(125, 36, 4, defaultChannel, 12, 22, colour.Green, font.MplusSmallFont, colour.Black, 0, 0)
 
 	//Create Connection B elements
 	connectionB.id = clientB
@@ -70,6 +78,10 @@ func initialiseRealtimeScreen() {
 	connectionB.getPresence = button.NewButton(50, 30, getPresenceText, 12, 20, colour.Black, font.MplusSmallFont, colour.Cyan, 0, 0)
 	connectionB.leavePresence = button.NewButton(70, 30, leavePresenceText, 12, 20, colour.Black, font.MplusSmallFont, colour.Cyan, 0, 0)
 	connectionB.eventInfo = text.NewText("", colour.White, font.MplusSmallFont, 0, 0)
+	connectionB.inputsLabel = text.NewText(fmt.Sprintf("%s :", inputsText), colour.Green, font.MplusSmallFont, 0, 0)
+	connectionB.inputChannelNameLabel = text.NewText(fmt.Sprintf("%s :", channelNameText), colour.Green, font.MplusSmallFont, 0, 0)
+	connectionB.inputChannelName = textbox.NewTextBox(125, 36, 4, defaultChannel, 12, 22, colour.Green, font.MplusSmallFont, colour.Black, 0, 0)
+
 }
 
 func drawRealtimeScreen(screen *ebiten.Image) {
@@ -93,7 +105,7 @@ func drawConnectionElements(screen *ebiten.Image, elements *connectionElements) 
 
 	// if client has been created
 	if connections[id] != nil && connections[id].client != nil {
-		drawClientInfo(screen, elements.createClient)
+		drawClientInfo(screen, elements.createClient, elements.inputsLabel, elements.inputChannelNameLabel, &elements.inputChannelName)
 		// if a channel has not been set for this client, draw the set channel button.
 		if connections[id].channel == nil {
 			elements.setChannel.Draw(screen)
@@ -127,8 +139,8 @@ func updateRealtimeScreen() {
 	updateCloseClientButton(&connectionA.closeClient, &connectionA.createClient, &connectionA.presenceInfo, &connectionA.eventInfo, connectionA.id)
 	updateCloseClientButton(&connectionB.closeClient, &connectionB.createClient, &connectionB.presenceInfo, &connectionB.eventInfo, connectionB.id)
 
-	updateSetChannelButton(&connectionA.setChannel, connectionA.id)
-	updateSetChannelButton(&connectionB.setChannel, connectionB.id)
+	updateSetChannelButton(&connectionA.setChannel, connectionA.inputChannelName.GetText(), connectionA.id)
+	updateSetChannelButton(&connectionB.setChannel, connectionB.inputChannelName.GetText(), connectionB.id)
 
 	updateChannelPublishButton(&connectionA.channelPublish, connectionA.id)
 	updateChannelPublishButton(&connectionB.channelPublish, connectionB.id)
@@ -145,14 +157,31 @@ func updateRealtimeScreen() {
 	updateLeavePresenceButton(&connectionA.leavePresence, connectionA.id)
 	updateLeavePresenceButton(&connectionB.leavePresence, connectionB.id)
 
+	updateInputChannelName(&connectionA.inputChannelName, connectionA.id)
+	updateInputChannelName(&connectionB.inputChannelName, connectionB.id)
+
 }
 
 // drawClientInfo draws a rectangle that is used to display client information.
 // This rectangle is anchored to an existing button.
-func drawClientInfo(screen *ebiten.Image, button button.Button) {
+func drawClientInfo(screen *ebiten.Image, button button.Button, inputsLabel text.Text, inputChannelNameLabel text.Text, inputChannelName *textbox.TextBox) {
 	ebitenutil.DrawRect(screen, float64(button.X), float64(button.Y)+float64(button.Height), (screenWidth/2)-10, screenHeight/3, colour.Green)
 	ebitenutil.DrawRect(screen, float64(button.X)+1, float64(button.Y)+float64(button.Height)+1, (screenWidth/2)-12, (screenHeight/3)-2, colour.Black)
 
+	// inputs label
+	inputsLabel.SetX(button.X + 10)
+	inputsLabel.SetY(button.Y + button.Height + 200)
+	inputsLabel.Draw(screen)
+
+	// input channel name
+	inputChannelNameLabel.SetX(button.X + 10)
+	inputChannelNameLabel.SetY(button.Y + button.Height + 240)
+	inputChannelNameLabel.Draw(screen)
+
+	// input channel name text box
+	inputChannelName.SetX(button.X + 150)
+	inputChannelName.SetY(button.Y + button.Height + 218)
+	inputChannelName.Draw(screen)
 }
 
 // drawChannelInfo draws channel information, it's location is anchored to an existing button
@@ -168,11 +197,11 @@ func drawChannelInfo(screen *ebiten.Image, elements *connectionElements) {
 	// channel name text box
 	elements.channelName.SetX(button.X + 10)
 	elements.channelName.SetY(button.Y + button.Height + 25)
-	elements.channelName.SetText(fmt.Sprintf("Channel Name : %s", connections[id].channel.Name))
+	elements.channelName.SetText(fmt.Sprintf("%s : %s", channelNameText, connections[id].channel.Name))
 	elements.channelName.Draw(screen)
 
 	// channel status text box
-	elements.channelStatus.SetX(button.X + 200)
+	elements.channelStatus.SetX(button.X + 280)
 	elements.channelStatus.SetY(button.Y + button.Height + 25)
 	elements.channelStatus.SetText(fmt.Sprintf("Status : %s", connections[id].channel.State()))
 	elements.channelStatus.Draw(screen)
@@ -289,7 +318,7 @@ func updateCloseClientButton(closeButton *button.Button, createButton *button.Bu
 }
 
 // updateSetChannelButton contains the update logic for each set channel button.
-func updateSetChannelButton(button *button.Button, id connectionID) {
+func updateSetChannelButton(button *button.Button, channelName string, id connectionID) {
 	// Handle mouseover interaction with a set channel button.
 	if button.IsMouseOver() {
 		button.SetBgColour(colour.Green)
@@ -301,7 +330,7 @@ func updateSetChannelButton(button *button.Button, id connectionID) {
 	if ebiten.IsMouseButtonPressed(ebiten.MouseButtonLeft) && button.IsMouseOver() {
 		// if the connection exists and does not have a channel.
 		if connections[id] != nil && connections[id].channel == nil {
-			setChannel(id)
+			setChannel(channelName, id)
 			infoBar.SetText(setChannelSuccess)
 		}
 	}
@@ -445,4 +474,20 @@ func updateLeavePresenceButton(button *button.Button, id connectionID) {
 		}
 		infoBar.SetText(leavePresenceSuccess)
 	}
+}
+
+// updateInputChannelName contains the update logic for input channel name text box
+func updateInputChannelName(textBox *textbox.TextBox, id connectionID) {
+
+	// a mouse click anywhere which is not over the text box will remove focus from it.
+	if inpututil.IsMouseButtonJustReleased(ebiten.MouseButtonLeft) && !textBox.IsMouseOver() {
+		textBox.RemoveFocus()
+	}
+
+	// a mouse click on the text box will set focus to it.
+	if inpututil.IsMouseButtonJustReleased(ebiten.MouseButtonLeft) && textBox.IsMouseOver() {
+		textBox.SetFocus()
+	}
+
+	textBox.Update()
 }
