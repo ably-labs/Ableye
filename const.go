@@ -5,9 +5,11 @@ import (
 )
 
 const (
-	titleText      = "Rosie Demo"
-	screenWidth    = 1366
-	screenHeight   = 768
-	defaultChannel = "test"
-	defaultTimeout = 5 * time.Second
+	titleText          = "Rosie Demo"
+	screenWidth        = 1366
+	screenHeight       = 768
+	defaultChannelName = "test"
+	defaultMessageName = "message"
+	defaultMessageData = "data"
+	defaultTimeout     = 5 * time.Second
 )

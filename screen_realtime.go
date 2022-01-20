@@ -20,7 +20,6 @@ type connectionElements struct {
 	setChannel          button.Button
 	channelName         text.Text
 	channelStatus       text.Text
-	channelPublish      button.Button
 	channelSubscribeAll button.Button
 	presenceInfo        text.Text
 	announcePresence    button.Button
@@ -29,6 +28,11 @@ type connectionElements struct {
 	eventInfo           text.Text
 	channelNameLabel    text.Text
 	channelNameInput    textbox.TextBox
+	messageNameLabel    text.Text
+	messageNameInput    textbox.TextBox
+	messageDataLabel    text.Text
+	messageDataInput    textbox.TextBox
+	channelPublish      button.Button
 }
 
 // The elements of the realtime screen.
@@ -51,7 +55,6 @@ func initialiseRealtimeScreen() {
 	connectionA.closeClient = button.NewButton(35, 35, "X", 12, 22, colour.Black, font.MplusSmallFont, colour.Red, (screenWidth/2)-45, screenHeight/6)
 	connectionA.channelName = text.NewText("", colour.Yellow, font.MplusSmallFont, 0, 0)
 	connectionA.channelStatus = text.NewText("", colour.Yellow, font.MplusSmallFont, 0, 0)
-	connectionA.channelPublish = button.NewButton(80, 30, publishText, 12, 20, colour.Black, font.MplusSmallFont, colour.Yellow, 0, 0)
 	connectionA.channelSubscribeAll = button.NewButton(125, 30, subscribeAllText, 12, 20, colour.Black, font.MplusSmallFont, colour.Yellow, 0, 0)
 	connectionA.presenceInfo = text.NewText("", colour.Cyan, font.MplusSmallFont, 0, 0)
 	connectionA.announcePresence = button.NewButton(100, 30, announcePresenceText, 12, 20, colour.Black, font.MplusSmallFont, colour.Cyan, 0, 0)
@@ -59,8 +62,13 @@ func initialiseRealtimeScreen() {
 	connectionA.leavePresence = button.NewButton(70, 30, leavePresenceText, 12, 20, colour.Black, font.MplusSmallFont, colour.Cyan, 0, 0)
 	connectionA.eventInfo = text.NewText("", colour.White, font.MplusSmallFont, 0, 0)
 	connectionA.channelNameLabel = text.NewText(fmt.Sprintf("%s :", channelNameText), colour.Green, font.MplusSmallFont, 0, 0)
-	connectionA.channelNameInput = textbox.NewTextBox(200, 36, 4, defaultChannel, 12, 22, colour.Green, font.MplusSmallFont, colour.Black, 0, 0)
+	connectionA.channelNameInput = textbox.NewTextBox(200, 36, 4, defaultChannelName, 9, 12, 22, colour.Green, font.MplusSmallFont, colour.Black, colour.Green, 0, 0)
 	connectionA.setChannel = button.NewButton(150, 35, setChannelText, 22, 22, colour.Black, font.MplusSmallFont, colour.Green, 0, 0)
+	connectionA.messageNameLabel = text.NewText(fmt.Sprintf("%s :", messageNameText), colour.Magenta, font.MplusSmallFont, 0, 0)
+	connectionA.messageNameInput = textbox.NewTextBox(200, 36, 4, defaultMessageName, 12, 12, 22, colour.Magenta, font.MplusSmallFont, colour.Black, colour.Magenta, 0, 0)
+	connectionA.messageDataLabel = text.NewText(fmt.Sprintf("%s :", messageDataText), colour.Magenta, font.MplusSmallFont, 0, 0)
+	connectionA.messageDataInput = textbox.NewTextBox(200, 36, 4, defaultMessageData, 12, 12, 22, colour.Magenta, font.MplusSmallFont, colour.Black, colour.Magenta, 0, 0)
+	connectionA.channelPublish = button.NewButton(80, 30, publishText, 12, 20, colour.Black, font.MplusSmallFont, colour.Magenta, 0, 0)
 
 	//Create Connection B elements
 	connectionB.id = clientB
@@ -76,13 +84,19 @@ func initialiseRealtimeScreen() {
 	connectionB.leavePresence = button.NewButton(70, 30, leavePresenceText, 12, 20, colour.Black, font.MplusSmallFont, colour.Cyan, 0, 0)
 	connectionB.eventInfo = text.NewText("", colour.White, font.MplusSmallFont, 0, 0)
 	connectionB.channelNameLabel = text.NewText(fmt.Sprintf("%s :", channelNameText), colour.Green, font.MplusSmallFont, 0, 0)
-	connectionB.channelNameInput = textbox.NewTextBox(200, 36, 4, defaultChannel, 12, 22, colour.Green, font.MplusSmallFont, colour.Black, 0, 0)
+	connectionB.channelNameInput = textbox.NewTextBox(200, 36, 4, defaultChannelName, 9, 12, 22, colour.Green, font.MplusSmallFont, colour.Black, colour.Green, 0, 0)
 	connectionB.setChannel = button.NewButton(150, 35, setChannelText, 22, 22, colour.Black, font.MplusSmallFont, colour.Green, 0, 0)
+	connectionB.messageNameLabel = text.NewText(fmt.Sprintf("%s :", messageNameText), colour.Magenta, font.MplusSmallFont, 0, 0)
+	connectionB.messageNameInput = textbox.NewTextBox(200, 36, 4, defaultMessageName, 18, 12, 22, colour.Magenta, font.MplusSmallFont, colour.Black, colour.Magenta, 0, 0)
+	connectionB.messageDataLabel = text.NewText(fmt.Sprintf("%s :", messageDataText), colour.Magenta, font.MplusSmallFont, 0, 0)
+	connectionB.messageDataInput = textbox.NewTextBox(200, 36, 4, defaultMessageData, 18, 12, 22, colour.Magenta, font.MplusSmallFont, colour.Black, colour.Magenta, 0, 0)
+	connectionB.channelPublish = button.NewButton(80, 30, publishText, 12, 20, colour.Black, font.MplusSmallFont, colour.Magenta, 0, 0)
 
 }
 
 func drawRealtimeScreen(screen *ebiten.Image) {
-	ebitenutil.DebugPrintAt(screen, "Ably Realtime", 0, 0)
+
+	// Info bar is used to display log messages and error messages.
 	infoBar.Draw(screen)
 
 	//Connection A elements
@@ -160,8 +174,8 @@ func updateRealtimeScreen() {
 	updateSetChannelButton(&connectionA.setChannel, connectionA.channelNameInput.GetText(), connectionA.id)
 	updateSetChannelButton(&connectionB.setChannel, connectionB.channelNameInput.GetText(), connectionB.id)
 
-	updateChannelPublishButton(&connectionA.channelPublish, connectionA.id)
-	updateChannelPublishButton(&connectionB.channelPublish, connectionB.id)
+	updateChannelPublishButton(&connectionA.channelPublish, connectionA.messageNameInput.GetText(), connectionA.messageDataInput.GetText(), connectionA.id)
+	updateChannelPublishButton(&connectionB.channelPublish, connectionB.messageNameInput.GetText(), connectionB.messageDataInput.GetText(), connectionB.id)
 
 	updateSubscribeChannelButton(&connectionA.channelSubscribeAll, &connectionA.eventInfo, connectionA.id)
 	updateSubscribeChannelButton(&connectionB.channelSubscribeAll, &connectionB.eventInfo, connectionB.id)
@@ -175,9 +189,14 @@ func updateRealtimeScreen() {
 	updateLeavePresenceButton(&connectionA.leavePresence, connectionA.id)
 	updateLeavePresenceButton(&connectionB.leavePresence, connectionB.id)
 
-	updateInputChannelName(&connectionA.channelNameInput, connectionA.id)
-	updateInputChannelName(&connectionB.channelNameInput, connectionB.id)
+	updateChannelNameInput(&connectionA.channelNameInput, connectionA.id)
+	updateChannelNameInput(&connectionB.channelNameInput, connectionB.id)
 
+	updateMessageNameInput(&connectionA.messageNameInput, connectionA.id)
+	updateMessageNameInput(&connectionB.messageNameInput, connectionB.id)
+
+	updateMessageDataInput(&connectionA.messageDataInput, connectionA.id)
+	updateMessageDataInput(&connectionB.messageDataInput, connectionB.id)
 }
 
 // drawClientInfo draws a rectangle that is used to display client information.
@@ -208,11 +227,6 @@ func drawChannelInfo(screen *ebiten.Image, elements *connectionElements) {
 	elements.channelStatus.SetY(button.Y + button.Height + 25)
 	elements.channelStatus.SetText(fmt.Sprintf("Status : %s", connections[id].channel.State()))
 	elements.channelStatus.Draw(screen)
-
-	// channel publish button
-	elements.channelPublish.SetX(button.X + 462)
-	elements.channelPublish.SetY(button.Y + button.Height + 4)
-	elements.channelPublish.Draw(screen)
 
 	// channel subscribe all button
 	elements.channelSubscribeAll.SetX(button.X + 543)
@@ -247,21 +261,46 @@ func drawChannelInfo(screen *ebiten.Image, elements *connectionElements) {
 	elements.leavePresence.SetY(button.Y + button.Height + 43)
 	elements.leavePresence.Draw(screen)
 
+	// message name label
+	elements.messageNameLabel.SetX(button.X + 10)
+	elements.messageNameLabel.SetY(button.Y + button.Height + 105)
+	elements.messageNameLabel.Draw(screen)
+
+	// message name input text box
+	elements.messageNameInput.SetX(button.X + 10)
+	elements.messageNameInput.SetY(button.Y + button.Height + 120)
+	elements.messageNameInput.Draw(screen)
+
+	// message data label
+	elements.messageDataLabel.SetX(button.X + 300)
+	elements.messageDataLabel.SetY(button.Y + button.Height + 105)
+	elements.messageDataLabel.Draw(screen)
+
+	// message data input text box
+	elements.messageDataInput.SetX(button.X + 300)
+	elements.messageDataInput.SetY(button.Y + button.Height + 120)
+	elements.messageDataInput.Draw(screen)
+
+	// channel publish button
+	elements.channelPublish.SetX(button.X + 550)
+	elements.channelPublish.SetY(button.Y + button.Height + 125)
+	elements.channelPublish.Draw(screen)
+
 }
 
 // drawEventInfo draws event information, it's location is anchored to an existing button
 func drawEventInfo(screen *ebiten.Image, button button.Button, eventInfo *text.Text) {
 	// event area
-	ebitenutil.DrawRect(screen, float64(button.X)+4, float64(button.Y)+float64(button.Height)+82, (screenWidth/2)-18, screenHeight/8, colour.White)
-	ebitenutil.DrawRect(screen, float64(button.X)+5, float64(button.Y)+float64(button.Height)+83, (screenWidth/2)-20, (screenHeight/8)-2, colour.Black)
+	ebitenutil.DrawRect(screen, float64(button.X)+4, float64(button.Y)+float64(button.Height)+182, (screenWidth/2)-18, screenHeight/12, colour.White)
+	ebitenutil.DrawRect(screen, float64(button.X)+5, float64(button.Y)+float64(button.Height)+183, (screenWidth/2)-20, (screenHeight/12)-2, colour.Black)
 
 	// if event info is being drawn in its initisalised location.
 	if eventInfo.X == 0 && eventInfo.Y == 0 {
 		// initalise the text
-		eventInfo.SetText("Event :")
+		eventInfo.SetText(eventInfoText)
 	}
 	eventInfo.SetX(button.X + 12)
-	eventInfo.SetY(button.Y + button.Height + 100)
+	eventInfo.SetY(button.Y + button.Height + 200)
 	eventInfo.Draw(screen)
 }
 
@@ -338,12 +377,12 @@ func updateSetChannelButton(button *button.Button, channelName string, id connec
 }
 
 // updateChannelPublishButton contains the update logic for each channel publish button.
-func updateChannelPublishButton(button *button.Button, id connectionID) {
+func updateChannelPublishButton(button *button.Button, messageName string, messageData interface{}, id connectionID) {
 	// Handle mouseover interaction with a leave presence button.
 	if button.IsMouseOver() {
 		button.SetBgColour(colour.White)
 	} else {
-		button.SetBgColour(colour.Yellow)
+		button.SetBgColour(colour.Magenta)
 	}
 
 	// if a connection exists that has a channel
@@ -351,7 +390,7 @@ func updateChannelPublishButton(button *button.Button, id connectionID) {
 
 		// and this button has been clicked.
 		if inpututil.IsMouseButtonJustReleased(ebiten.MouseButtonLeft) && button.IsMouseOver() {
-			err := publishToChannel(id)
+			err := publishToChannel(id, messageName, messageData)
 			if err != nil {
 				infoBar.SetText(err.Error())
 				return
@@ -359,7 +398,6 @@ func updateChannelPublishButton(button *button.Button, id connectionID) {
 			infoBar.SetText(publishToChannelSuccess)
 		}
 	}
-
 }
 
 //updateSubscribeChannelButton contains the logic to update a subscribe button.
@@ -483,8 +521,40 @@ func updateLeavePresenceButton(button *button.Button, id connectionID) {
 	}
 }
 
-// updateInputChannelName contains the update logic for input channel name text box
-func updateInputChannelName(textBox *textbox.TextBox, id connectionID) {
+// updateChannelNameInput contains the update logic for a channel name input text box
+func updateChannelNameInput(textBox *textbox.TextBox, id connectionID) {
+
+	// a mouse click anywhere which is not over the text box will remove focus from it.
+	if inpututil.IsMouseButtonJustReleased(ebiten.MouseButtonLeft) && !textBox.IsMouseOver() {
+		textBox.RemoveFocus()
+	}
+
+	// a mouse click on the text box will set focus to it.
+	if inpututil.IsMouseButtonJustReleased(ebiten.MouseButtonLeft) && textBox.IsMouseOver() {
+		textBox.SetFocus()
+	}
+
+	textBox.Update()
+}
+
+// updateMessageNameInput contains the update logic for a message name input text box
+func updateMessageNameInput(textBox *textbox.TextBox, id connectionID) {
+
+	// a mouse click anywhere which is not over the text box will remove focus from it.
+	if inpututil.IsMouseButtonJustReleased(ebiten.MouseButtonLeft) && !textBox.IsMouseOver() {
+		textBox.RemoveFocus()
+	}
+
+	// a mouse click on the text box will set focus to it.
+	if inpututil.IsMouseButtonJustReleased(ebiten.MouseButtonLeft) && textBox.IsMouseOver() {
+		textBox.SetFocus()
+	}
+
+	textBox.Update()
+}
+
+// updateMessageDataInput contains the update logic for a message data input text box
+func updateMessageDataInput(textBox *textbox.TextBox, id connectionID) {
 
 	// a mouse click anywhere which is not over the text box will remove focus from it.
 	if inpututil.IsMouseButtonJustReleased(ebiten.MouseButtonLeft) && !textBox.IsMouseOver() {

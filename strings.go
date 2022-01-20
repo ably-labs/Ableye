@@ -23,8 +23,10 @@ var (
 	leavePresenceText    = "Leave"
 
 	// Display text
-	inputsText      = "Inputs"
 	channelNameText = "Channel Name"
+	messageNameText = "Message Name"
+	messageDataText = "Message Data"
+	eventInfoText   = "Events will be displayed here in realtime."
 
 	// Async processes
 	startGetPresence    = "go routine started to get presence."

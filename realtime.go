@@ -120,8 +120,9 @@ func subscribeAll(id connectionID, eventInfo *text.Text) (func(), error) {
 func newEventHandler(eventInfo *text.Text) func(*ably.Message) {
 	return func(msg *ably.Message) {
 		log.Printf("Received message: name=%s data=%v\n", msg.Name, msg.Data)
+
 		if eventInfo != nil {
-			eventInfo.SetText(fmt.Sprintf("Event : %s, %s, %s,", msg.ClientID, msg.Name, msg.Data))
+			eventInfo.SetText(fmt.Sprintf("Event Received From Client ID : %s\n\n%s : %s     %s: %s", msg.ClientID, messageNameText, msg.Name, messageDataText, msg.Data))
 		}
 	}
 }
@@ -136,13 +137,13 @@ func unsubscribe(id connectionID) {
 
 }
 
-func publishToChannel(id connectionID) error {
+func publishToChannel(id connectionID, messageName string, messageData interface{}) error {
 
 	// Set timeout to be default timeout
 	ctx, cancel := context.WithTimeout(connections[id].context, defaultTimeout)
 	defer cancel()
 
-	if err := connections[id].channel.Publish(ctx, "Event Name", "Event Data"); err != nil {
+	if err := connections[id].channel.Publish(ctx, messageName, messageData); err != nil {
 		return err
 	}
 	log.Println(publishToChannelSuccess)

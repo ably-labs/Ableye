@@ -23,13 +23,12 @@ Completed:
 * Clients can publish a message to a channel
 * Clients can display messages received on a channel
 * Clients can change the name of the channel
+* Clients can change the data that they publish to a channel
 
 TODO:
 
-* Currently crashes when creating channel with name "", handle this gracefully.
-* Give clients a way to change the data that they publish to a channel
 * Increase the number of connections that can be created from 2 to 4
-* Replicate functionality for the realtime client for the rest client
+* Refactoring clean up
 * Display the SDK version on the title screen
 * Add some nice graphics
 

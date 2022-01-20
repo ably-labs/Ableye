@@ -13,29 +13,31 @@ import (
 
 // TextBox represents a textbox.
 type TextBox struct {
-	Width                 int
-	Height                int
-	text                  string
-	textOffsetX           int
-	textOffsetY           int
-	textColour            *color.NRGBA
-	font                  font.Face
-	BgColour              *color.NRGBA
-	X                     int
-	Y                     int
-	Image                 *ebiten.Image
-	selectedBorderImage   *ebiten.Image
-	unselectedBorderImage *ebiten.Image
-	borderSize            int
-	isSelected            bool
-	runes                 []rune
-	counter               int // counter is used to make the cursor blink
+	Width                  int
+	Height                 int
+	text                   string
+	maxTextLength          int
+	textOffsetX            int
+	textOffsetY            int
+	textColour             *color.NRGBA
+	font                   font.Face
+	BgColour               *color.NRGBA
+	X                      int
+	Y                      int
+	Image                  *ebiten.Image
+	selectedBorderImage    *ebiten.Image
+	unselectedBorderImage  *ebiten.Image
+	unselectedBorderColour *color.NRGBA
+	borderSize             int
+	isSelected             bool
+	runes                  []rune
+	counter                int // counter is used to make the cursor blink
 }
 
 // Draw is used to draw a textbox to the screen.
 func (t *TextBox) Draw(screen *ebiten.Image) {
 
-	// draw the selected or unselected border
+	// Draw the selected or unselected border.
 	opts := &ebiten.DrawImageOptions{}
 	opts.GeoM.Translate(float64(t.X), float64(t.Y))
 	if t.isSelected {
@@ -44,11 +46,11 @@ func (t *TextBox) Draw(screen *ebiten.Image) {
 		screen.DrawImage(t.unselectedBorderImage, opts)
 	}
 
-	// draw the background
+	// Draw the background.
 	opts.GeoM.Translate(float64(t.borderSize), float64(t.borderSize))
 	screen.DrawImage(t.Image, opts)
 
-	// draw the text
+	// Draw the text.
 	text.Draw(screen, t.text, t.font, t.X+t.textOffsetX, t.Y+t.textOffsetY, t.textColour)
 
 	// Blink the cursor.
@@ -114,33 +116,35 @@ func (t *TextBox) IsMouseOver() bool {
 }
 
 // NewTextBox is a contructor that creates a new text box.
-func NewTextBox(width int, height int, borderSize int, text string, textOffsetX int, textOffsetY int, textColour *color.NRGBA, font font.Face, bgColour *color.NRGBA, x int, y int) TextBox {
+func NewTextBox(width int, height int, borderSize int, text string, maxTextLength int, textOffsetX int, textOffsetY int, textColour *color.NRGBA, font font.Face, bgColour *color.NRGBA, unselectedBorderColour *color.NRGBA, x int, y int) TextBox {
 
 	selectedBorderImg := ebiten.NewImage(width, height)
 	selectedBorderImg.Fill(colour.White)
 
 	unselectedBorderImg := ebiten.NewImage(width, height)
-	unselectedBorderImg.Fill(colour.Green)
+	unselectedBorderImg.Fill(unselectedBorderColour)
 
 	img := ebiten.NewImage(width-(borderSize*2), height-(borderSize*2))
 	img.Fill(bgColour)
 
 	return TextBox{
-		Width:                 width,
-		Height:                height,
-		text:                  text,
-		textOffsetX:           textOffsetX,
-		textOffsetY:           textOffsetY,
-		textColour:            textColour,
-		font:                  font,
-		BgColour:              bgColour,
-		X:                     x,
-		Y:                     y,
-		Image:                 img,
-		selectedBorderImage:   selectedBorderImg,
-		unselectedBorderImage: unselectedBorderImg,
-		borderSize:            borderSize,
-		isSelected:            false,
+		Width:                  width,
+		Height:                 height,
+		text:                   text,
+		maxTextLength:          maxTextLength,
+		textOffsetX:            textOffsetX,
+		textOffsetY:            textOffsetY,
+		textColour:             textColour,
+		font:                   font,
+		BgColour:               bgColour,
+		X:                      x,
+		Y:                      y,
+		Image:                  img,
+		selectedBorderImage:    selectedBorderImg,
+		unselectedBorderImage:  unselectedBorderImg,
+		unselectedBorderColour: unselectedBorderColour,
+		borderSize:             borderSize,
+		isSelected:             false,
 	}
 }
 
@@ -150,8 +154,8 @@ func (t *TextBox) Update() {
 	// Can only write in the text box if it is selected
 	if t.isSelected {
 
-		// max 9 characters per text box
-		if len(t.text) < 9 {
+		// Control the maximum text length.
+		if len(t.text) < t.maxTextLength {
 			// get the input character
 			t.runes = ebiten.AppendInputChars(t.runes[:0])
 
@@ -176,11 +180,11 @@ func repeatingKeyPressed(key ebiten.Key) bool {
 		delay    = 30
 		interval = 3
 	)
-	d := inpututil.KeyPressDuration(key)
-	if d == 1 {
+	duration := inpututil.KeyPressDuration(key)
+	if duration == 1 {
 		return true
 	}
-	if d >= delay && (d-delay)%interval == 0 {
+	if duration >= delay && (duration-delay)%interval == 0 {
 		return true
 	}
 	return false
