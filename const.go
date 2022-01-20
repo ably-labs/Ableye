@@ -9,5 +9,5 @@ const (
 	screenWidth    = 1366
 	screenHeight   = 768
 	defaultChannel = "test"
-	defaultTimeout = 10 * time.Second
+	defaultTimeout = 5 * time.Second
 )

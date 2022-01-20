@@ -279,7 +279,7 @@ func updateCreateClientButton(button *button.Button, id connectionID) {
 	}
 
 	// Handle mouse click on a create client button
-	if ebiten.IsMouseButtonPressed(ebiten.MouseButtonLeft) && button.IsMouseOver() {
+	if inpututil.IsMouseButtonJustReleased(ebiten.MouseButtonLeft) && button.IsMouseOver() {
 		if connections[id] == nil {
 			if err := createRealtimeClient(id); err != nil {
 				infoBar.SetText(err.Error())
@@ -303,7 +303,7 @@ func updateCloseClientButton(closeButton *button.Button, createButton *button.Bu
 	}
 
 	// Handle mouse click on a close client button.
-	if ebiten.IsMouseButtonPressed(ebiten.MouseButtonLeft) && closeButton.IsMouseOver() {
+	if inpututil.IsMouseButtonJustReleased(ebiten.MouseButtonLeft) && closeButton.IsMouseOver() {
 		closeRealtimeClient(id)
 		infoBar.SetText(closeRealtimeClientSuccess)
 		// Reset the create button once a client is closed.
@@ -328,7 +328,7 @@ func updateSetChannelButton(button *button.Button, channelName string, id connec
 	}
 
 	// Handle mouse click on set channel button.
-	if ebiten.IsMouseButtonPressed(ebiten.MouseButtonLeft) && button.IsMouseOver() {
+	if inpututil.IsMouseButtonJustReleased(ebiten.MouseButtonLeft) && button.IsMouseOver() {
 		// if the connection exists and does not have a channel.
 		if connections[id] != nil && connections[id].channel == nil {
 			setChannel(channelName, id)
