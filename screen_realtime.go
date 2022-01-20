@@ -52,7 +52,7 @@ func initialiseRealtimeScreen() {
 	//Initialise connection A elements.
 	connectionA.id = clientA
 	connectionA.createClient = button.NewButton(150, 35, createClientText, 22, 22, colour.Black, font.MplusSmallFont, colour.Yellow, 0, screenHeight/6)
-	connectionA.closeClient = button.NewButton(35, 35, "X", 12, 22, colour.Black, font.MplusSmallFont, colour.Red, (screenWidth/2)-45, screenHeight/6)
+	connectionA.closeClient = button.NewButton(35, 35, "X", 12, 22, colour.Black, font.MplusSmallFont, colour.Red, 0, 0)
 	connectionA.channelName = text.NewText("", colour.Yellow, font.MplusSmallFont, 0, 0)
 	connectionA.channelStatus = text.NewText("", colour.Yellow, font.MplusSmallFont, 0, 0)
 	connectionA.channelSubscribeAll = button.NewButton(125, 30, subscribeAllText, 12, 20, colour.Black, font.MplusSmallFont, colour.Yellow, 0, 0)
@@ -73,7 +73,7 @@ func initialiseRealtimeScreen() {
 	//Create Connection B elements
 	connectionB.id = clientB
 	connectionB.createClient = button.NewButton(150, 35, createClientText, 22, 22, colour.Black, font.MplusSmallFont, colour.Yellow, screenWidth/2, screenHeight/6)
-	connectionB.closeClient = button.NewButton(35, 35, "X", 12, 22, colour.Black, font.MplusSmallFont, colour.Red, (screenWidth)-45, screenHeight/6)
+	connectionB.closeClient = button.NewButton(35, 35, "X", 12, 22, colour.Black, font.MplusSmallFont, colour.Red, 0, 0)
 	connectionB.channelName = text.NewText("", colour.Yellow, font.MplusSmallFont, 0, 0)
 	connectionB.channelStatus = text.NewText("", colour.Yellow, font.MplusSmallFont, 0, 0)
 	connectionB.channelPublish = button.NewButton(80, 30, publishText, 12, 20, colour.Black, font.MplusSmallFont, colour.Yellow, 0, 0)
@@ -91,7 +91,6 @@ func initialiseRealtimeScreen() {
 	connectionB.messageDataLabel = text.NewText(fmt.Sprintf("%s :", messageDataText), colour.Magenta, font.MplusSmallFont, 0, 0)
 	connectionB.messageDataInput = textbox.NewTextBox(200, 36, 4, defaultMessageData, 18, 12, 22, colour.Magenta, font.MplusSmallFont, colour.Black, colour.Magenta, 0, 0)
 	connectionB.channelPublish = button.NewButton(80, 30, publishText, 12, 20, colour.Black, font.MplusSmallFont, colour.Magenta, 0, 0)
-
 }
 
 func drawRealtimeScreen(screen *ebiten.Image) {
@@ -116,14 +115,16 @@ func drawConnectionElements(screen *ebiten.Image, elements *connectionElements) 
 
 	// if client has been created
 	if connections[id] != nil && connections[id].client != nil {
-		drawClientInfo(screen, elements.createClient)
+		drawClientInfo(screen, elements.createClient, &elements.closeClient)
+
+		// draw the close client button.
+
+		elements.closeClient.Draw(screen)
 
 		// if a channel has not been set for this client, draw the elements required to set the channel.
 		if connections[id].channel == nil {
 			drawSetChannel(screen, elements.createClient, elements.channelNameLabel, &elements.channelNameInput, &elements.setChannel)
 		}
-		// draw the close client button.
-		elements.closeClient.Draw(screen)
 	}
 
 	// if client channel has been created
@@ -201,9 +202,15 @@ func updateRealtimeScreen() {
 
 // drawClientInfo draws a rectangle that is used to display client information.
 // This rectangle is anchored to an existing button.
-func drawClientInfo(screen *ebiten.Image, button button.Button) {
+func drawClientInfo(screen *ebiten.Image, createClient button.Button, closeClient *button.Button) {
+	button := createClient
 	ebitenutil.DrawRect(screen, float64(button.X), float64(button.Y)+float64(button.Height), (screenWidth/2)-10, screenHeight/3, colour.Green)
 	ebitenutil.DrawRect(screen, float64(button.X)+1, float64(button.Y)+float64(button.Height)+1, (screenWidth/2)-12, (screenHeight/3)-2, colour.Black)
+
+	// draw the close client button
+	closeClient.SetX(button.X + 638)
+	closeClient.SetY(button.Y)
+	closeClient.Draw(screen)
 }
 
 // drawChannelInfo draws channel information, it's location is anchored to an existing button
