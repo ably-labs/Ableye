@@ -223,7 +223,6 @@ func drawChannelInfo(screen *ebiten.Image, elements *connectionElements) {
 	ebitenutil.DrawRect(screen, float64(button.X)+8, float64(button.Y)+float64(button.Height)+42, (screenWidth/2)-26, screenHeight/24, colour.Cyan)
 	ebitenutil.DrawRect(screen, float64(button.X)+9, float64(button.Y)+float64(button.Height)+43, (screenWidth/2)-28, (screenHeight/24)-2, colour.Black)
 
-	// presence info text box
 	// if presenceInfo is being drawn in its initisalised location.
 	if elements.presenceInfo.X == 0 && elements.presenceInfo.Y == 0 {
 		// initalise the text
@@ -256,7 +255,6 @@ func drawEventInfo(screen *ebiten.Image, button button.Button, eventInfo *text.T
 	ebitenutil.DrawRect(screen, float64(button.X)+4, float64(button.Y)+float64(button.Height)+82, (screenWidth/2)-18, screenHeight/8, colour.White)
 	ebitenutil.DrawRect(screen, float64(button.X)+5, float64(button.Y)+float64(button.Height)+83, (screenWidth/2)-20, (screenHeight/8)-2, colour.Black)
 
-	// event info text box
 	// if event info is being drawn in its initisalised location.
 	if eventInfo.X == 0 && eventInfo.Y == 0 {
 		// initalise the text
@@ -348,17 +346,20 @@ func updateChannelPublishButton(button *button.Button, id connectionID) {
 		button.SetBgColour(colour.Yellow)
 	}
 
-	// Handle mouse click on publish channel button.
-	// As this button has no conditional to prevent its action triggering on every frame,
-	// the action to publish channel is performed on mouse release.
-	if inpututil.IsMouseButtonJustReleased(ebiten.MouseButtonLeft) && button.IsMouseOver() {
-		err := publishToChannel(id)
-		if err != nil {
-			infoBar.SetText(err.Error())
-			return
+	// if a connection exists that has a channel
+	if connections[id] != nil && connections[id].channel != nil {
+
+		// and this button has been clicked.
+		if inpututil.IsMouseButtonJustReleased(ebiten.MouseButtonLeft) && button.IsMouseOver() {
+			err := publishToChannel(id)
+			if err != nil {
+				infoBar.SetText(err.Error())
+				return
+			}
+			infoBar.SetText(publishToChannelSuccess)
 		}
-		infoBar.SetText(publishToChannelSuccess)
 	}
+
 }
 
 //updateSubscribeChannelButton contains the logic to update a subscribe button.
@@ -381,13 +382,11 @@ func updateSubscribeChannelButton(button *button.Button, eventInfo *text.Text, i
 		button.SetBgColour(colour.Yellow)
 	}
 
-	// Handle mouse click on subscribe all button.
-	// As this button toggles between two states, the trigger is the mouse button releasing.
-	// This prevents the button from quickly toggling if the mouse button is held down.
+	// if the button is clicked
 	if inpututil.IsMouseButtonJustReleased(ebiten.MouseButtonLeft) && button.IsMouseOver() {
-		// if a channel exists and the connection has no unsubscribe function saved
 
-		if connections[id].channel != nil && connections[id].unsubscribe == nil {
+		// if a channel exists and the connection has no unsubscribe function saved
+		if connections[id] != nil && connections[id].channel != nil && connections[id].unsubscribe == nil {
 
 			unsubscribeAll, err := subscribeAll(id, eventInfo)
 			if err != nil {
@@ -404,7 +403,7 @@ func updateSubscribeChannelButton(button *button.Button, eventInfo *text.Text, i
 		}
 
 		// if there is an unsubscribe function saved
-		if connections[id].unsubscribe != nil {
+		if connections[id] != nil && connections[id].unsubscribe != nil {
 			unsubscribe(id)
 			infoBar.SetText(unsubscribeSuccess)
 			// tear down channel unsubcribe function
@@ -425,17 +424,19 @@ func updateAnnouncePresenceButton(button *button.Button, id connectionID) {
 		button.SetBgColour(colour.Cyan)
 	}
 
-	// Handle mouse click on announce presence button.
-	// As this button has no conditional to prevent its action triggering on every frame,
-	// the action to announce presence is performed on mouse release.
-	if inpututil.IsMouseButtonJustReleased(ebiten.MouseButtonLeft) && button.IsMouseOver() {
+	// if a connection exists that has a channel
+	if connections[id] != nil && connections[id].channel != nil {
 
-		err := announcePresence(id)
-		if err != nil {
-			infoBar.SetText(err.Error())
-			return
+		// and the button is clicked
+		if inpututil.IsMouseButtonJustReleased(ebiten.MouseButtonLeft) && button.IsMouseOver() {
+
+			err := announcePresence(id)
+			if err != nil {
+				infoBar.SetText(err.Error())
+				return
+			}
+			infoBar.SetText(announcePresenceSuccess)
 		}
-		infoBar.SetText(announcePresenceSuccess)
 	}
 }
 
@@ -448,12 +449,14 @@ func updateGetPresenceButton(button *button.Button, text *text.Text, id connecti
 		button.SetBgColour(colour.Cyan)
 	}
 
-	// Handle mouse click on get presence button.
-	// As this button has no conditional to prevent its action triggering on every frame,
-	// the action to get presence is performed on mouse release.
-	if inpututil.IsMouseButtonJustReleased(ebiten.MouseButtonLeft) && button.IsMouseOver() {
-		// the call to get presence is async to prevent blocking.
-		go getPresence(id, text)
+	// if a connection exists that has a channel
+	if connections[id] != nil && connections[id].channel != nil {
+
+		// and the button is clicked
+		if inpututil.IsMouseButtonJustReleased(ebiten.MouseButtonLeft) && button.IsMouseOver() {
+			// the call to get presence is async to prevent blocking.
+			go getPresence(id, text)
+		}
 	}
 }
 
@@ -466,16 +469,17 @@ func updateLeavePresenceButton(button *button.Button, id connectionID) {
 		button.SetBgColour(colour.Cyan)
 	}
 
-	// Handle mouse click on leave presence button.
-	// As this button has no conditional to prevent its action triggering on every frame,
-	// the action to leave presence is performed on mouse release.
-	if inpututil.IsMouseButtonJustReleased(ebiten.MouseButtonLeft) && button.IsMouseOver() {
-		err := leavePresence(id)
-		if err != nil {
-			infoBar.SetText(err.Error())
-			return
+	// if a connection exists that has a channel
+	if connections[id] != nil && connections[id].channel != nil {
+		// and the button is clicked
+		if inpututil.IsMouseButtonJustReleased(ebiten.MouseButtonLeft) && button.IsMouseOver() {
+			err := leavePresence(id)
+			if err != nil {
+				infoBar.SetText(err.Error())
+				return
+			}
+			infoBar.SetText(leavePresenceSuccess)
 		}
-		infoBar.SetText(leavePresenceSuccess)
 	}
 }
 
