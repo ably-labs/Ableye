@@ -2,7 +2,6 @@ package textbox
 
 import (
 	"image/color"
-	//"unicode/utf8"
 
 	colour "github.com/ably-labs/rosie-demo/colours"
 	"github.com/hajimehoshi/ebiten/v2"
