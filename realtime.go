@@ -146,6 +146,7 @@ func publishToChannel(id connectionID, messageName string, messageData interface
 	if err := connections[id].channel.Publish(ctx, messageName, messageData); err != nil {
 		return err
 	}
+
 	log.Println(publishToChannelSuccess)
 	return nil
 }

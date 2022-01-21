@@ -14,7 +14,7 @@ var (
 )
 
 func initialiseTitleScreen() {
-	realtimeButton = button.NewButton(200, 100, "Ably Realtime", 25, 55, colour.White, font.MplusNormalFont, colour.Red, (screenWidth/2)-100, (screenHeight/2)-100)
+	realtimeButton = button.NewButton(200, 100, "Ably Realtime", 25, 55, colour.White, font.MplusNormalFont, colour.BrightRed, (screenWidth/2)-100, (screenHeight/2)-100)
 }
 
 func drawTitleScreen(screen *ebiten.Image) {
@@ -24,9 +24,9 @@ func drawTitleScreen(screen *ebiten.Image) {
 func updateTitleScreen() {
 
 	if realtimeButton.IsMouseOver() {
-		realtimeButton.SetBgColour(colour.Magenta)
+		realtimeButton.SetBgColour(colour.JazzyPink)
 	} else {
-		realtimeButton.SetBgColour(colour.Red)
+		realtimeButton.SetBgColour(colour.BrightRed)
 	}
 
 	// Handle mouse click on realtime button

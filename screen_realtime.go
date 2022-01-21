@@ -58,24 +58,24 @@ func initialiseRealtimeScreen() {
 // and saves the connectionElement information in a global variable
 func initialiseConnectionElements(elements *connectionElements, id connectionID, x int, y int) {
 	elements.id = id
-	elements.createClient = button.NewButton(150, 35, createClientText, 22, 22, colour.Black, font.MplusSmallFont, colour.Yellow, x, y)
-	elements.closeClient = button.NewButton(35, 35, "X", 12, 22, colour.Black, font.MplusSmallFont, colour.Red, 0, 0)
-	elements.channelName = text.NewText("", colour.Yellow, font.MplusSmallFont, 0, 0)
-	elements.channelStatus = text.NewText("", colour.Yellow, font.MplusSmallFont, 0, 0)
-	elements.channelSubscribeAll = button.NewButton(125, 30, subscribeAllText, 12, 20, colour.Black, font.MplusSmallFont, colour.Yellow, 0, 0)
-	elements.presenceInfo = text.NewText("", colour.Cyan, font.MplusSmallFont, 0, 0)
-	elements.announcePresence = button.NewButton(100, 30, announcePresenceText, 12, 20, colour.Black, font.MplusSmallFont, colour.Cyan, 0, 0)
-	elements.getPresence = button.NewButton(50, 30, getPresenceText, 12, 20, colour.Black, font.MplusSmallFont, colour.Cyan, 0, 0)
-	elements.leavePresence = button.NewButton(70, 30, leavePresenceText, 12, 20, colour.Black, font.MplusSmallFont, colour.Cyan, 0, 0)
+	elements.createClient = button.NewButton(150, 35, createClientText, 22, 22, colour.Black, font.MplusSmallFont, colour.White, x, y)
+	elements.closeClient = button.NewButton(35, 35, "X", 12, 22, colour.Black, font.MplusSmallFont, colour.BrightRed, 0, 0)
+	elements.channelName = text.NewText("", colour.ZingyGreen, font.MplusSmallFont, 0, 0)
+	elements.channelStatus = text.NewText("", colour.ZingyGreen, font.MplusSmallFont, 0, 0)
+	elements.channelSubscribeAll = button.NewButton(125, 30, subscribeAllText, 12, 20, colour.Black, font.MplusSmallFont, colour.ZingyGreen, 0, 0)
+	elements.presenceInfo = text.NewText("", colour.ElectricCyan, font.MplusSmallFont, 0, 0)
+	elements.announcePresence = button.NewButton(100, 30, announcePresenceText, 12, 20, colour.Black, font.MplusSmallFont, colour.ElectricCyan, 0, 0)
+	elements.getPresence = button.NewButton(50, 30, getPresenceText, 12, 20, colour.Black, font.MplusSmallFont, colour.ElectricCyan, 0, 0)
+	elements.leavePresence = button.NewButton(70, 30, leavePresenceText, 12, 20, colour.Black, font.MplusSmallFont, colour.ElectricCyan, 0, 0)
 	elements.eventInfo = text.NewText("", colour.White, font.MplusSmallFont, 0, 0)
-	elements.channelNameLabel = text.NewText(fmt.Sprintf("%s :", channelNameText), colour.Green, font.MplusSmallFont, 0, 0)
-	elements.channelNameInput = textbox.NewTextBox(200, 36, 4, defaultChannelName, 9, 12, 22, colour.Green, font.MplusSmallFont, colour.Black, colour.Green, 0, 0)
-	elements.setChannel = button.NewButton(150, 35, setChannelText, 22, 22, colour.Black, font.MplusSmallFont, colour.Green, 0, 0)
-	elements.messageNameLabel = text.NewText(fmt.Sprintf("%s :", messageNameText), colour.Magenta, font.MplusSmallFont, 0, 0)
-	elements.messageNameInput = textbox.NewTextBox(200, 36, 4, defaultMessageName, 12, 12, 22, colour.Magenta, font.MplusSmallFont, colour.Black, colour.Magenta, 0, 0)
-	elements.messageDataLabel = text.NewText(fmt.Sprintf("%s :", messageDataText), colour.Magenta, font.MplusSmallFont, 0, 0)
-	elements.messageDataInput = textbox.NewTextBox(200, 36, 4, defaultMessageData, 12, 12, 22, colour.Magenta, font.MplusSmallFont, colour.Black, colour.Magenta, 0, 0)
-	elements.channelPublish = button.NewButton(80, 30, publishText, 12, 20, colour.Black, font.MplusSmallFont, colour.Magenta, 0, 0)
+	elements.channelNameLabel = text.NewText(fmt.Sprintf("%s :", channelNameText), colour.ZingyGreen, font.MplusSmallFont, 0, 0)
+	elements.channelNameInput = textbox.NewTextBox(200, 36, 4, defaultChannelName, 9, 12, 22, colour.ZingyGreen, font.MplusSmallFont, colour.Black, colour.ZingyGreen, 0, 0)
+	elements.setChannel = button.NewButton(150, 35, setChannelText, 22, 22, colour.Black, font.MplusSmallFont, colour.ZingyGreen, 0, 0)
+	elements.messageNameLabel = text.NewText(fmt.Sprintf("%s :", messageNameText), colour.JazzyPink, font.MplusSmallFont, 0, 0)
+	elements.messageNameInput = textbox.NewTextBox(200, 36, 4, defaultMessageName, 12, 12, 22, colour.JazzyPink, font.MplusSmallFont, colour.Black, colour.JazzyPink, 0, 0)
+	elements.messageDataLabel = text.NewText(fmt.Sprintf("%s :", messageDataText), colour.JazzyPink, font.MplusSmallFont, 0, 0)
+	elements.messageDataInput = textbox.NewTextBox(200, 36, 4, defaultMessageData, 12, 12, 22, colour.JazzyPink, font.MplusSmallFont, colour.Black, colour.JazzyPink, 0, 0)
+	elements.channelPublish = button.NewButton(80, 30, publishText, 12, 20, colour.Black, font.MplusSmallFont, colour.JazzyPink, 0, 0)
 }
 
 // drawRealtimeScreen draws the realtime screen.
@@ -129,7 +129,7 @@ func drawClientInfo(screen *ebiten.Image, createClient button.Button, closeClien
 	button := createClient
 
 	// Draw a window which is made from two overlapping images.
-	ebitenutil.DrawRect(screen, float64(button.X), float64(button.Y)+float64(button.Height), (screenWidth/2)-10, screenHeight/3, colour.Green)
+	ebitenutil.DrawRect(screen, float64(button.X), float64(button.Y)+float64(button.Height), (screenWidth/2)-10, screenHeight/3, colour.ZingyGreen)
 	ebitenutil.DrawRect(screen, float64(button.X)+1, float64(button.Y)+float64(button.Height)+1, (screenWidth/2)-12, (screenHeight/3)-2, colour.Black)
 
 	// Draw the close client button.
@@ -165,7 +165,7 @@ func drawChannelInfo(screen *ebiten.Image, elements *connectionElements) {
 	id := elements.id
 
 	// Draw the channel window.
-	ebitenutil.DrawRect(screen, float64(button.X)+4, float64(button.Y)+float64(button.Height)+3, (screenWidth/2)-18, screenHeight/10, colour.Yellow)
+	ebitenutil.DrawRect(screen, float64(button.X)+4, float64(button.Y)+float64(button.Height)+3, (screenWidth/2)-18, screenHeight/10, colour.ZingyGreen)
 	ebitenutil.DrawRect(screen, float64(button.X)+5, float64(button.Y)+float64(button.Height)+4, (screenWidth/2)-20, (screenHeight/10)-2, colour.Black)
 
 	// Draw the channel name text box.
@@ -186,7 +186,7 @@ func drawChannelInfo(screen *ebiten.Image, elements *connectionElements) {
 	elements.channelSubscribeAll.Draw(screen)
 
 	// Draw the presence window.
-	ebitenutil.DrawRect(screen, float64(button.X)+8, float64(button.Y)+float64(button.Height)+42, (screenWidth/2)-26, screenHeight/24, colour.Cyan)
+	ebitenutil.DrawRect(screen, float64(button.X)+8, float64(button.Y)+float64(button.Height)+42, (screenWidth/2)-26, screenHeight/24, colour.ElectricCyan)
 	ebitenutil.DrawRect(screen, float64(button.X)+9, float64(button.Y)+float64(button.Height)+43, (screenWidth/2)-28, (screenHeight/24)-2, colour.Black)
 
 	// If presence information is being drawn in its initisalised location.
@@ -305,12 +305,12 @@ func updateConnectionElements(elements *connectionElements) {
 func updateCreateClientButton(button *button.Button, id connectionID) {
 	// Handle mouseover interaction with create button while a connection does not exist.
 	if button.IsMouseOver() && connections[id] == nil {
-		button.SetBgColour(colour.Green)
+		button.SetBgColour(colour.ZingyGreen)
 	}
 
 	// if the button is not moused over and there is no connection.
 	if !button.IsMouseOver() && connections[id] == nil {
-		button.SetBgColour(colour.Yellow)
+		button.SetBgColour(colour.White)
 	}
 
 	// Handle mouse click on a create client button
@@ -320,7 +320,7 @@ func updateCreateClientButton(button *button.Button, id connectionID) {
 				infoBar.SetText(err.Error())
 			}
 			infoBar.SetText(createRealtimeClientSuccess)
-			button.SetBgColour(colour.Green)
+			button.SetBgColour(colour.ZingyGreen)
 			button.SetText(id.string())
 		}
 	}
@@ -342,7 +342,7 @@ func updateCloseClientButton(closeButton *button.Button, createButton *button.Bu
 		closeRealtimeClient(id)
 		infoBar.SetText(closeRealtimeClientSuccess)
 		// Reset the create button once a client is closed.
-		createButton.SetBgColour(colour.Yellow)
+		createButton.SetBgColour(colour.ZingyGreen)
 		createButton.SetText(createClientText)
 
 		// Reset the presence text once a client is closed.
@@ -359,7 +359,7 @@ func updateSetChannelButton(button *button.Button, channelName string, id connec
 	if button.IsMouseOver() {
 		button.SetBgColour(colour.White)
 	} else {
-		button.SetBgColour(colour.Green)
+		button.SetBgColour(colour.ZingyGreen)
 	}
 
 	// Handle mouse click on set channel button.
@@ -378,7 +378,7 @@ func updateChannelPublishButton(button *button.Button, messageName string, messa
 	if button.IsMouseOver() {
 		button.SetBgColour(colour.White)
 	} else {
-		button.SetBgColour(colour.Magenta)
+		button.SetBgColour(colour.JazzyPink)
 	}
 
 	// if a connection exists that has a channel
@@ -412,7 +412,7 @@ func updateSubscribeChannelButton(button *button.Button, eventInfo *text.Text, i
 
 	// if the button is not moused over and the channel is not subscribed.
 	if !button.IsMouseOver() && connections[id] != nil && connections[id].unsubscribe == nil {
-		button.SetBgColour(colour.Yellow)
+		button.SetBgColour(colour.ZingyGreen)
 	}
 
 	// if the button is clicked
@@ -431,7 +431,7 @@ func updateSubscribeChannelButton(button *button.Button, eventInfo *text.Text, i
 			infoBar.SetText(subscribeAllSuccess)
 
 			// Change the SubscribeAll button into an Unsubscribe button.
-			button.SetBgColour(colour.Red)
+			button.SetBgColour(colour.BrightRed)
 			button.SetText(unsubscribeText)
 			return
 		}
@@ -455,7 +455,7 @@ func updateAnnouncePresenceButton(button *button.Button, id connectionID) {
 	if button.IsMouseOver() {
 		button.SetBgColour(colour.White)
 	} else {
-		button.SetBgColour(colour.Cyan)
+		button.SetBgColour(colour.ElectricCyan)
 	}
 
 	// if a connection exists that has a channel
@@ -480,7 +480,7 @@ func updateGetPresenceButton(button *button.Button, text *text.Text, id connecti
 	if button.IsMouseOver() {
 		button.SetBgColour(colour.White)
 	} else {
-		button.SetBgColour(colour.Cyan)
+		button.SetBgColour(colour.ElectricCyan)
 	}
 
 	// if a connection exists that has a channel
@@ -500,7 +500,7 @@ func updateLeavePresenceButton(button *button.Button, id connectionID) {
 	if button.IsMouseOver() {
 		button.SetBgColour(colour.White)
 	} else {
-		button.SetBgColour(colour.Cyan)
+		button.SetBgColour(colour.ElectricCyan)
 	}
 
 	// if a connection exists that has a channel
