@@ -39,21 +39,18 @@ type connectionElements struct {
 var (
 	infoBar button.Button
 
-	//Connection A elements
-	connectionA connectionElements
-
-	//Connection B elements
-	connectionB connectionElements
+	//Connection Elements
+	connectionA, connectionB, connectionC, connectionD connectionElements
 )
 
 func initialiseRealtimeScreen() {
-	infoBar = button.NewButton(screenWidth, 35, "information bar", 22, 22, colour.Black, font.MplusSmallFont, colour.White, 0, 25)
+	infoBar = button.NewButton(screenWidth, 35, "", 22, 22, colour.Black, font.MplusSmallFont, colour.White, 0, 25)
 
-	//Initialise connection A elements.
+	//Initialise connection elements.
 	initialiseConnectionElements(&connectionA, clientA, 0, screenHeight/6)
-
-	//Initialise connection B elements
 	initialiseConnectionElements(&connectionB, clientB, screenWidth/2, screenHeight/6)
+	initialiseConnectionElements(&connectionC, clientC, 0, (screenHeight/2)+75)
+	initialiseConnectionElements(&connectionD, clientD, screenWidth/2, (screenHeight/2)+75)
 }
 
 // initialiseConnectionElements, creates all the button, text and text box elements
@@ -87,11 +84,11 @@ func drawRealtimeScreen(screen *ebiten.Image) {
 	// Info bar is used to display log messages and error messages.
 	infoBar.Draw(screen)
 
-	//Connection A elements
+	//Draw elements for each connection
 	drawConnectionElements(screen, &connectionA)
-
-	//Connection B elements
 	drawConnectionElements(screen, &connectionB)
+	drawConnectionElements(screen, &connectionC)
+	drawConnectionElements(screen, &connectionD)
 }
 
 // drawConnectionElements draws all the elements associated with a connection to the screen.
@@ -273,11 +270,11 @@ func updateRealtimeScreen() {
 		state = titleScreen
 	}
 
-	// Update elements for connection A.
+	// Update elements for each connection.
 	updateConnectionElements(&connectionA)
-
-	//Update elements for connection B.
 	updateConnectionElements(&connectionB)
+	updateConnectionElements(&connectionC)
+	updateConnectionElements(&connectionD)
 }
 
 // updateConnectionElements updates all the elements for a connection.
@@ -427,6 +424,7 @@ func updateSubscribeChannelButton(button *button.Button, eventInfo *text.Text, i
 			unsubscribeAll, err := subscribeAll(id, eventInfo)
 			if err != nil {
 				infoBar.SetText(err.Error())
+				return
 			}
 			// Save the unsubscribe function.
 			connections[id].unsubscribe = &unsubscribeAll

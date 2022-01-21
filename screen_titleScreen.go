@@ -14,7 +14,7 @@ var (
 )
 
 func initialiseTitleScreen() {
-	realtimeButton = button.NewButton(200, 100, "Ably Realtime", 25, 55, colour.White, font.MplusNormalFont, colour.Red, (screenWidth/2)-100, (screenHeight/2)+50)
+	realtimeButton = button.NewButton(200, 100, "Ably Realtime", 25, 55, colour.White, font.MplusNormalFont, colour.Red, (screenWidth/2)-100, (screenHeight/2)-100)
 }
 
 func drawTitleScreen(screen *ebiten.Image) {

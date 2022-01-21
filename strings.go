@@ -13,7 +13,7 @@ var (
 	leavePresenceSuccess        = "Successfully removed presence."
 
 	// Button text
-	createClientText     = "Create Client"
+	createClientText     = "New Client"
 	setChannelText       = "Set Channel"
 	publishText          = "Publish"
 	subscribeAllText     = "Subscribe All"

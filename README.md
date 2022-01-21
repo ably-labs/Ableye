@@ -5,7 +5,6 @@ This is my demo project using Go and Ably Realtime.
 I want to create a tool which can be used to do exploratory testing of Go SDK
 Similar to how Postman can be used to exploratory testing of an API
 
-
 ## Work in progress
 
 Work in progress project name: Ableye
@@ -24,11 +23,10 @@ Completed:
 * Clients can display messages received on a channel
 * Clients can change the name of the channel
 * Clients can change the data that they publish to a channel
+* Number of connections that can be created increased from 2 to 4
 
 TODO:
 
-* Increase the number of connections that can be created from 2 to 4
-* Refactoring clean up
 * Display the SDK version on the title screen
 * Add some nice graphics
 
