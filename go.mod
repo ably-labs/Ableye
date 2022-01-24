@@ -1,4 +1,4 @@
-module github.com/ably-labs/rosie-demo
+module github.com/ably-labs/Ableye
 
 go 1.17
 

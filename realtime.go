@@ -6,8 +6,8 @@ import (
 	"fmt"
 	"log"
 
-	"github.com/ably-labs/rosie-demo/config"
-	"github.com/ably-labs/rosie-demo/text"
+	"github.com/ably-labs/Ableye/config"
+	"github.com/ably-labs/Ableye/text"
 	ably "github.com/ably/ably-go/ably"
 )
 

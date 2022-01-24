@@ -3,11 +3,11 @@ package main
 import (
 	"fmt"
 
-	"github.com/ably-labs/rosie-demo/button"
-	colour "github.com/ably-labs/rosie-demo/colours"
-	font "github.com/ably-labs/rosie-demo/fonts"
-	"github.com/ably-labs/rosie-demo/text"
-	"github.com/ably-labs/rosie-demo/textbox"
+	"github.com/ably-labs/Ableye/button"
+	colour "github.com/ably-labs/Ableye/colours"
+	font "github.com/ably-labs/Ableye/fonts"
+	"github.com/ably-labs/Ableye/text"
+	"github.com/ably-labs/Ableye/textbox"
 
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/hajimehoshi/ebiten/v2/ebitenutil"

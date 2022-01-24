@@ -6,7 +6,7 @@ import (
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/hajimehoshi/ebiten/v2/ebitenutil"
 
-	"github.com/ably-labs/rosie-demo/config"
+	"github.com/ably-labs/Ableye/config"
 )
 
 func drawDebugText(screen *ebiten.Image) {

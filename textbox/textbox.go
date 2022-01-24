@@ -3,7 +3,7 @@ package textbox
 import (
 	"image/color"
 
-	colour "github.com/ably-labs/rosie-demo/colours"
+	colour "github.com/ably-labs/Ableye/colours"
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/hajimehoshi/ebiten/v2/inpututil"
 	"github.com/hajimehoshi/ebiten/v2/text"

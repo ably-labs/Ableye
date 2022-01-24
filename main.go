@@ -4,7 +4,7 @@ import (
 	_ "image/jpeg"
 	"log"
 
-	"github.com/ably-labs/rosie-demo/config"
+	"github.com/ably-labs/Ableye/config"
 
 	"github.com/hajimehoshi/ebiten/v2"
 )
