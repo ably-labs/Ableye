@@ -137,6 +137,7 @@ func unsubscribe(id connectionID) {
 
 }
 
+// publishToChannel publishes message name and message data to a channel.
 func publishToChannel(id connectionID, messageName string, messageData interface{}) error {
 
 	// Set timeout to be default timeout
@@ -153,7 +154,6 @@ func publishToChannel(id connectionID, messageName string, messageData interface
 
 // announcePresence announces the presence of a client to a channel.
 func announcePresence(id connectionID) error {
-
 	// Set timeout to be default timeout
 	ctx, cancel := context.WithTimeout(connections[id].context, defaultTimeout)
 	defer cancel()
@@ -196,7 +196,6 @@ func getPresence(id connectionID, presenceInfo *text.Text) {
 
 // leavePresence removes the presence of a client from a channel.
 func leavePresence(id connectionID) error {
-
 	// Set timeout to be default timeout
 	ctx, cancel := context.WithTimeout(connections[id].context, defaultTimeout)
 	defer cancel()

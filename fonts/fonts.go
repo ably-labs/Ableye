@@ -1,10 +1,11 @@
 package fonts
 
 import (
+	"log"
+
 	"github.com/golang/freetype/truetype"
 	"github.com/hajimehoshi/ebiten/examples/resources/fonts"
 	"golang.org/x/image/font"
-	"log"
 )
 
 const (
@@ -12,8 +13,9 @@ const (
 )
 
 var (
-	MplusNormalFont font.Face
 	MplusSmallFont  font.Face
+	MplusNormalFont font.Face
+	MplusLargeFont  font.Face
 )
 
 func init() {
@@ -23,14 +25,20 @@ func init() {
 		log.Fatal(err)
 	}
 
+	MplusSmallFont = truetype.NewFace(tt, &truetype.Options{
+		Size:    16,
+		DPI:     fontDpi,
+		Hinting: font.HintingFull,
+	})
+
 	MplusNormalFont = truetype.NewFace(tt, &truetype.Options{
 		Size:    24,
 		DPI:     fontDpi,
 		Hinting: font.HintingFull,
 	})
 
-	MplusSmallFont = truetype.NewFace(tt, &truetype.Options{
-		Size:    16,
+	MplusLargeFont = truetype.NewFace(tt, &truetype.Options{
+		Size:    72,
 		DPI:     fontDpi,
 		Hinting: font.HintingFull,
 	})

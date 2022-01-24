@@ -4,9 +4,9 @@ import (
 	_ "image/jpeg"
 	"log"
 
-	"github.com/hajimehoshi/ebiten/v2"
-
 	"github.com/ably-labs/rosie-demo/config"
+
+	"github.com/hajimehoshi/ebiten/v2"
 )
 
 var (

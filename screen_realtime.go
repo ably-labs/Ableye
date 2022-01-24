@@ -8,6 +8,7 @@ import (
 	font "github.com/ably-labs/rosie-demo/fonts"
 	"github.com/ably-labs/rosie-demo/text"
 	"github.com/ably-labs/rosie-demo/textbox"
+
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/hajimehoshi/ebiten/v2/ebitenutil"
 	"github.com/hajimehoshi/ebiten/v2/inpututil"
@@ -84,7 +85,7 @@ func drawRealtimeScreen(screen *ebiten.Image) {
 	// Info bar is used to display log messages and error messages.
 	infoBar.Draw(screen)
 
-	//Draw elements for each connection
+	//Draw elements for each connection.
 	drawConnectionElements(screen, &connectionA)
 	drawConnectionElements(screen, &connectionB)
 	drawConnectionElements(screen, &connectionC)
@@ -142,17 +143,17 @@ func drawSetChannel(screen *ebiten.Image, createClient button.Button, channelNam
 	// Elements are drawn in locations that are calculated from the location of the create client button.
 	button := createClient
 
-	// channel name label
+	// Channel name label.
 	channelNameLabel.SetX(button.X + 10)
 	channelNameLabel.SetY(button.Y + button.Height + 40)
 	channelNameLabel.Draw(screen)
 
-	// channel name input text box
+	// Channel name input text box.
 	channelNameInput.SetX(button.X + 150)
 	channelNameInput.SetY(button.Y + button.Height + 18)
 	channelNameInput.Draw(screen)
 
-	// set channel button
+	// Set channel button.
 	setChannel.SetX(button.X + 375)
 	setChannel.SetY(button.Y + button.Height + 18)
 	setChannel.Draw(screen)
