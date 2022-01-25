@@ -21,6 +21,7 @@ type connectionElements struct {
 	setChannel          button.Button
 	channelName         text.Text
 	channelStatus       text.Text
+	channelDetach       button.Button
 	channelAttach       button.Button
 	channelSubscribeAll button.Button
 	presenceInfo        text.Text
@@ -64,6 +65,7 @@ func initialiseConnectionElements(elements *connectionElements, id connectionID,
 	elements.closeClient = button.NewButton(35, 35, "X", 12, 22, colour.Black, font.MplusSmallFont, colour.BrightRed, 0, 0)
 	elements.channelName = text.NewText("", colour.ZingyGreen, font.MplusSmallFont, 0, 0)
 	elements.channelStatus = text.NewText("", colour.ZingyGreen, font.MplusSmallFont, 0, 0)
+	elements.channelDetach = button.NewButton(75, 30, detachText, 10, 20, colour.Black, font.MplusSmallFont, colour.ZingyGreen, 0, 0)
 	elements.channelAttach = button.NewButton(75, 30, attachText, 10, 20, colour.Black, font.MplusSmallFont, colour.ZingyGreen, 0, 0)
 	elements.channelSubscribeAll = button.NewButton(115, 30, subscribeAllText, 10, 20, colour.Black, font.MplusSmallFont, colour.ZingyGreen, 0, 0)
 	elements.presenceInfo = text.NewText("", colour.ElectricCyan, font.MplusSmallFont, 0, 0)
@@ -178,10 +180,15 @@ func drawChannelInfo(screen *ebiten.Image, elements *connectionElements) {
 	elements.channelName.Draw(screen)
 
 	// Draw the channel status text box.
-	elements.channelStatus.SetX(button.X + 280)
+	elements.channelStatus.SetX(button.X + 230)
 	elements.channelStatus.SetY(button.Y + button.Height + 25)
 	elements.channelStatus.SetText(fmt.Sprintf("Status : %s", connections[id].channel.State()))
 	elements.channelStatus.Draw(screen)
+
+	//Draw the channel detach button.
+	elements.channelDetach.SetX(button.X + 401)
+	elements.channelDetach.SetY(button.Y + button.Height + 4)
+	elements.channelDetach.Draw(screen)
 
 	//Draw the channel attach button.
 	elements.channelAttach.SetX(button.X + 477)
@@ -296,6 +303,7 @@ func updateConnectionElements(elements *connectionElements) {
 	updateSetChannelButton(&elements.setChannel, elements.channelNameInput.GetText(), elements.id)
 
 	// Channel controls.
+	updateChannelDetachButton(&elements.channelDetach, elements.id)
 	updateChannelAttachButton(&elements.channelAttach, elements.id)
 	updateSubscribeChannelButton(&elements.channelSubscribeAll, &elements.eventInfo, elements.id)
 
@@ -400,7 +408,31 @@ func updateChannelPublishButton(button *button.Button, messageName string, messa
 				infoBar.SetText(err.Error())
 				return
 			}
-			infoBar.SetText(publishToChannelSuccess)
+			infoBar.SetText(publishSuccess)
+		}
+	}
+}
+
+// updateChannelDetachhButton contains the update logic for each channel attach button.
+func updateChannelDetachButton(button *button.Button, id connectionID) {
+	// Handle mouseover interaction with a channel attach button.
+	if button.IsMouseOver() {
+		button.SetBgColour(colour.White)
+	} else {
+		button.SetBgColour(colour.ZingyGreen)
+	}
+
+	// if a connection exists that has a channel
+	if connections[id] != nil && connections[id].channel != nil {
+
+		// and this button has been clicked.
+		if inpututil.IsMouseButtonJustReleased(ebiten.MouseButtonLeft) && button.IsMouseOver() {
+			err := detachChannel(id)
+			if err != nil {
+				infoBar.SetText(err.Error())
+				return
+			}
+			infoBar.SetText(detachChannelSuccess)
 		}
 	}
 }
@@ -419,12 +451,12 @@ func updateChannelAttachButton(button *button.Button, id connectionID) {
 
 		// and this button has been clicked.
 		if inpututil.IsMouseButtonJustReleased(ebiten.MouseButtonLeft) && button.IsMouseOver() {
-			err := attachToChannel(id)
+			err := attachChannel(id)
 			if err != nil {
 				infoBar.SetText(err.Error())
 				return
 			}
-			infoBar.SetText(attachToChannelSuccess)
+			infoBar.SetText(attachChannelSuccess)
 		}
 	}
 }

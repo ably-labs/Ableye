@@ -101,9 +101,22 @@ func setChannel(name string, id connectionID) {
 	log.Println(setChannelSuccess)
 }
 
-// attachToChannel attaches a client to a channel.
-func attachToChannel(id connectionID) error {
+// detachChannel attaches a client to a channel.
+func detachChannel(id connectionID) error {
+	// Set timeout to be default timeout
+	ctx, cancel := context.WithTimeout(connections[id].context, defaultTimeout)
+	defer cancel()
 
+	if err := connections[id].channel.Detach(ctx); err != nil {
+		return err
+	}
+
+	log.Println(detachChannelSuccess)
+	return nil
+}
+
+// attachChannel attaches a client to a channel.
+func attachChannel(id connectionID) error {
 	// Set timeout to be default timeout
 	ctx, cancel := context.WithTimeout(connections[id].context, defaultTimeout)
 	defer cancel()
@@ -112,7 +125,7 @@ func attachToChannel(id connectionID) error {
 		return err
 	}
 
-	log.Println(attachToChannelSuccess)
+	log.Println(attachChannelSuccess)
 	return nil
 }
 
@@ -163,7 +176,7 @@ func publishToChannel(id connectionID, messageName string, messageData interface
 		return err
 	}
 
-	log.Println(publishToChannelSuccess)
+	log.Println(publishSuccess)
 	return nil
 }
 

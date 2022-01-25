@@ -31,6 +31,7 @@ const (
 	createClientText     = "New Client"
 	setChannelText       = "Set Channel"
 	publishText          = "Publish"
+	detachText           = "Detach"
 	attachText           = "Attach"
 	subscribeAllText     = "Subscribe All"
 	unsubscribeText      = "Unsubscribe"
@@ -39,7 +40,7 @@ const (
 	leavePresenceText    = "Leave"
 
 	// Display text
-	channelNameText = "Channel Name"
+	channelNameText = "Channel"
 	messageNameText = "Message Name"
 	messageDataText = "Message Data"
 	eventInfoText   = "Events will be displayed here in realtime."
@@ -51,8 +52,9 @@ const (
 	createRealtimeClientSuccess = "Successfully created a new realtime client."
 	closeRealtimeClientSuccess  = "Successfully closed a realtime client."
 	setChannelSuccess           = "Successfully set channel for realtime client."
-	attachToChannelSuccess      = "Successfuly attached to channel."
-	publishToChannelSuccess     = "Successfully published to channel."
+	detachChannelSuccess        = "Successfully detached from channel."
+	attachChannelSuccess        = "Successfuly attached to channel."
+	publishSuccess              = "Successfully published to channel."
 	subscribeAllSuccess         = "Successfully subscribed to all channel messages."
 	unsubscribeSuccess          = "Successfully unsubscribed from channel messages."
 	announcePresenceSuccess     = "Successfully announced presence."
