@@ -27,20 +27,11 @@ const (
 	defaultMessageName = "message"
 	defaultMessageData = "data"
 
-	// Log messages
-	createRealtimeClientSuccess = "Successfully created a new realtime client."
-	closeRealtimeClientSuccess  = "Successfully closed a realtime client."
-	setChannelSuccess           = "Successfully set channel for realtime client."
-	publishToChannelSuccess     = "Successfully published to channel."
-	subscribeAllSuccess         = "Successfully subscribed to all channel messages."
-	unsubscribeSuccess          = "Successfully unsubscribed from channel messages."
-	announcePresenceSuccess     = "Successfully announced presence."
-	leavePresenceSuccess        = "Successfully removed presence."
-
 	// Button text
 	createClientText     = "New Client"
 	setChannelText       = "Set Channel"
 	publishText          = "Publish"
+	attachText           = "Attach"
 	subscribeAllText     = "Subscribe All"
 	unsubscribeText      = "Unsubscribe"
 	announcePresenceText = "Announce"
@@ -52,6 +43,20 @@ const (
 	messageNameText = "Message Name"
 	messageDataText = "Message Data"
 	eventInfoText   = "Events will be displayed here in realtime."
+
+	/////////////////////////
+	// Log messages.
+	/////////////////////////
+
+	createRealtimeClientSuccess = "Successfully created a new realtime client."
+	closeRealtimeClientSuccess  = "Successfully closed a realtime client."
+	setChannelSuccess           = "Successfully set channel for realtime client."
+	attachToChannelSuccess      = "Successfuly attached to channel."
+	publishToChannelSuccess     = "Successfully published to channel."
+	subscribeAllSuccess         = "Successfully subscribed to all channel messages."
+	unsubscribeSuccess          = "Successfully unsubscribed from channel messages."
+	announcePresenceSuccess     = "Successfully announced presence."
+	leavePresenceSuccess        = "Successfully removed presence."
 
 	// Async processes
 	startGetPresence    = "go routine started to get presence."

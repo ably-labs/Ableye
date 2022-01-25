@@ -21,6 +21,7 @@ type connectionElements struct {
 	setChannel          button.Button
 	channelName         text.Text
 	channelStatus       text.Text
+	channelAttach       button.Button
 	channelSubscribeAll button.Button
 	presenceInfo        text.Text
 	announcePresence    button.Button
@@ -63,7 +64,8 @@ func initialiseConnectionElements(elements *connectionElements, id connectionID,
 	elements.closeClient = button.NewButton(35, 35, "X", 12, 22, colour.Black, font.MplusSmallFont, colour.BrightRed, 0, 0)
 	elements.channelName = text.NewText("", colour.ZingyGreen, font.MplusSmallFont, 0, 0)
 	elements.channelStatus = text.NewText("", colour.ZingyGreen, font.MplusSmallFont, 0, 0)
-	elements.channelSubscribeAll = button.NewButton(125, 30, subscribeAllText, 12, 20, colour.Black, font.MplusSmallFont, colour.ZingyGreen, 0, 0)
+	elements.channelAttach = button.NewButton(75, 30, attachText, 10, 20, colour.Black, font.MplusSmallFont, colour.ZingyGreen, 0, 0)
+	elements.channelSubscribeAll = button.NewButton(115, 30, subscribeAllText, 10, 20, colour.Black, font.MplusSmallFont, colour.ZingyGreen, 0, 0)
 	elements.presenceInfo = text.NewText("", colour.ElectricCyan, font.MplusSmallFont, 0, 0)
 	elements.announcePresence = button.NewButton(100, 30, announcePresenceText, 12, 20, colour.Black, font.MplusSmallFont, colour.ElectricCyan, 0, 0)
 	elements.getPresence = button.NewButton(50, 30, getPresenceText, 12, 20, colour.Black, font.MplusSmallFont, colour.ElectricCyan, 0, 0)
@@ -181,8 +183,13 @@ func drawChannelInfo(screen *ebiten.Image, elements *connectionElements) {
 	elements.channelStatus.SetText(fmt.Sprintf("Status : %s", connections[id].channel.State()))
 	elements.channelStatus.Draw(screen)
 
-	// Draw the channel subscribe button.
-	elements.channelSubscribeAll.SetX(button.X + 543)
+	//Draw the channel attach button.
+	elements.channelAttach.SetX(button.X + 477)
+	elements.channelAttach.SetY(button.Y + button.Height + 4)
+	elements.channelAttach.Draw(screen)
+
+	// Draw the channel subscribe/unsubscribe button.
+	elements.channelSubscribeAll.SetX(button.X + 553)
 	elements.channelSubscribeAll.SetY(button.Y + button.Height + 4)
 	elements.channelSubscribeAll.Draw(screen)
 
@@ -289,6 +296,7 @@ func updateConnectionElements(elements *connectionElements) {
 	updateSetChannelButton(&elements.setChannel, elements.channelNameInput.GetText(), elements.id)
 
 	// Channel controls.
+	updateChannelAttachButton(&elements.channelAttach, elements.id)
 	updateSubscribeChannelButton(&elements.channelSubscribeAll, &elements.eventInfo, elements.id)
 
 	// Presence controls.
@@ -375,7 +383,7 @@ func updateSetChannelButton(button *button.Button, channelName string, id connec
 
 // updateChannelPublishButton contains the update logic for each channel publish button.
 func updateChannelPublishButton(button *button.Button, messageName string, messageData interface{}, id connectionID) {
-	// Handle mouseover interaction with a leave presence button.
+	// Handle mouseover interaction with a channel publish button.
 	if button.IsMouseOver() {
 		button.SetBgColour(colour.White)
 	} else {
@@ -393,6 +401,30 @@ func updateChannelPublishButton(button *button.Button, messageName string, messa
 				return
 			}
 			infoBar.SetText(publishToChannelSuccess)
+		}
+	}
+}
+
+// updateChannelAttachButton contains the update logic for each channel attach button.
+func updateChannelAttachButton(button *button.Button, id connectionID) {
+	// Handle mouseover interaction with a channel attach button.
+	if button.IsMouseOver() {
+		button.SetBgColour(colour.White)
+	} else {
+		button.SetBgColour(colour.ZingyGreen)
+	}
+
+	// if a connection exists that has a channel
+	if connections[id] != nil && connections[id].channel != nil {
+
+		// and this button has been clicked.
+		if inpututil.IsMouseButtonJustReleased(ebiten.MouseButtonLeft) && button.IsMouseOver() {
+			err := attachToChannel(id)
+			if err != nil {
+				infoBar.SetText(err.Error())
+				return
+			}
+			infoBar.SetText(attachToChannelSuccess)
 		}
 	}
 }

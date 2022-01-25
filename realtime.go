@@ -101,6 +101,21 @@ func setChannel(name string, id connectionID) {
 	log.Println(setChannelSuccess)
 }
 
+// attachToChannel attaches a client to a channel.
+func attachToChannel(id connectionID) error {
+
+	// Set timeout to be default timeout
+	ctx, cancel := context.WithTimeout(connections[id].context, defaultTimeout)
+	defer cancel()
+
+	if err := connections[id].channel.Attach(ctx); err != nil {
+		return err
+	}
+
+	log.Println(attachToChannelSuccess)
+	return nil
+}
+
 // subscribeAll subscribes the connection's channel to all messsages.
 // once subscribe events are output to the eventInfo text box
 func subscribeAll(id connectionID, eventInfo *text.Text) (func(), error) {
