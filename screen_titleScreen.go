@@ -27,7 +27,7 @@ func initialiseTitleScreen() {
 	title = text.NewText(titleText, colour.White, font.MplusLargeFont, (screenWidth/2)-115, screenHeight/2)
 	tagline = text.NewText(taglineText, colour.White, font.MplusNormalFont, (screenWidth/2)-200, (screenHeight/2)+75)
 	sdkVersion = text.NewText(fmt.Sprintf("SDK version : ably-go %s", config.Cfg.AblyGoSDKVersion), colour.White, font.MplusSmallFont, (screenWidth/2)-100, (screenHeight/2)+125)
-	realtimeButton = button.NewButton(320, 100, realtimeText, 25, 55, colour.White, font.MplusNormalFont, colour.BrightRed, (screenWidth/2)-155, (screenHeight/2)+200)
+	realtimeButton = button.NewButton(320, 100, realtimeText, 35, 55, colour.White, font.MplusNormalFont, colour.BrightRed, (screenWidth/2)-155, (screenHeight/2)+200)
 
 	// initialise images from image files.
 	var err error
