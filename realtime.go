@@ -158,11 +158,11 @@ func announcePresence(id connectionID) error {
 	ctx, cancel := context.WithTimeout(connections[id].context, defaultTimeout)
 	defer cancel()
 
-	err := connections[id].channel.Presence.Enter(ctx, nil)
-	if err != nil {
+	if err := connections[id].channel.Presence.Enter(ctx, nil); err != nil {
 		log.Println(err)
 		return err
 	}
+
 	log.Println(announcePresenceSuccess)
 	return nil
 }
@@ -177,11 +177,15 @@ func getPresence(id connectionID, presenceInfo *text.Text) {
 	ctx, cancel := context.WithTimeout(connections[id].context, defaultTimeout)
 	defer cancel()
 
-	presenceMessages, _ := connections[id].channel.Presence.Get(ctx)
+	presenceMessages, err := connections[id].channel.Presence.Get(ctx)
+	if err != nil {
+		log.Println(err)
+		return
+	}
 
-	for i, v := range presenceMessages {
-		if v != nil {
-			buffer.WriteString(v.ClientID)
+	for i, msg := range presenceMessages {
+		if msg != nil {
+			buffer.WriteString(msg.ClientID)
 			// if not the last message, add a comma and a space.
 			if i != len(presenceMessages)-1 {
 				buffer.WriteString(", ")

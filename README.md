@@ -34,4 +34,4 @@ Message name and message data can be input and published to the channel using th
 
 ## Known issues
 
-The `Announce` button must be clicked twice to announce client presence.
+* The `Announce` button must sometimes be clicked twice for a client to be able to see their own presence in a channel. See https://github.com/ably/ably-go/issues/436
