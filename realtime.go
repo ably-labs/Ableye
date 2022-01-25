@@ -150,7 +150,7 @@ func newEventHandler(eventInfo *text.Text) func(*ably.Message) {
 		log.Printf("Received message: name=%s data=%v\n", msg.Name, msg.Data)
 
 		if eventInfo != nil {
-			eventInfo.SetText(fmt.Sprintf("Event Received From Client ID : %s\n\n%s : %s     %s: %s", msg.ClientID, messageNameText, msg.Name, messageDataText, msg.Data))
+			eventInfo.SetText(fmt.Sprintf("Event Received From : %s\n\n%s : %s     %s: %s", msg.ClientID, messageNameText, msg.Name, messageDataText, msg.Data))
 		}
 	}
 }

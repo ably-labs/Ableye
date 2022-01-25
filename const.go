@@ -41,8 +41,8 @@ const (
 
 	// Display text
 	channelNameText = "Channel"
-	messageNameText = "Message Name"
-	messageDataText = "Message Data"
+	messageNameText = "Name"
+	messageDataText = "Data"
 	eventInfoText   = "Events will be displayed here in realtime."
 
 	/////////////////////////
