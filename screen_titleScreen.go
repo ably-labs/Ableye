@@ -56,8 +56,11 @@ func drawTitleScreen(screen *ebiten.Image) {
 func updateTitleScreen() {
 	if realtimeButton.IsMouseOver() {
 		realtimeButton.SetBgColour(colour.JazzyPink)
+		ebiten.SetCursorShape(ebiten.CursorShapePointer)
+
 	} else {
 		realtimeButton.SetBgColour(colour.BrightRed)
+		ebiten.SetCursorShape(ebiten.CursorShapeDefault)
 	}
 
 	// Handle mouse click on realtime button
