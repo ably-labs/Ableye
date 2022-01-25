@@ -26,7 +26,7 @@ Left mouse click on the `New Client` buttons to create up to 4 realtime clients.
 
 A channel can be set on a client by inputting a channel name and left mouse clicking the `Set Channel` button.
 
-Once a channel has been initialised, the channel can be subscribed to by clicking the `Subscribe All` button. After subscribing to a channel a window will appear to display events in realtime.
+Once a channel has been initialised, the channel can be subscribed to by clicking the `Subscribe All` button. After subscribing to a channel a window will appear to display events in realtime. It is also possible to attach or detach from the channel at any time by clicking on the `Attach` or `Detach` buttons.
 
 Presence can be interacted with using the `Announce`, `Get` and `Leave` buttons.
 
