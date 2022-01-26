@@ -1,6 +1,7 @@
 package main
 
 import (
+	"errors"
 	_ "image/jpeg"
 	"log"
 
@@ -24,9 +25,20 @@ func NewGame() *Game {
 	return &Game{}
 }
 
+//handleClose is called when the used closes the game window.
+func handleClose() {
+	for _, connection := range connections {
+		connection.client.Close()
+	}
+}
+
 //Update updates the logical state.
 func (g *Game) Update() error {
 
+	if ebiten.IsWindowBeingClosed() {
+		handleClose()
+		return errors.New("window has been closed")
+	}
 	// Handle updates for each game state.
 	switch state {
 	case titleScreen:
@@ -71,6 +83,9 @@ func main() {
 
 	// Create a new instance of game.
 	game := NewGame()
+
+	// Set window closing handled to true.
+	ebiten.SetWindowClosingHandled(true)
 
 	// Run the game.
 	if err := ebiten.RunGame(game); err != nil {
