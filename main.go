@@ -27,8 +27,11 @@ func NewGame() *Game {
 
 //handleClose is called when the used closes the game window.
 func handleClose() {
-	for _, connection := range connections {
-		connection.client.Close()
+	connectionIDs := []connectionID{clientA, clientB, clientC, clientD}
+	for _, id := range connectionIDs {
+		if connections[id] != nil && connections[id].client != nil {
+			connections[id].client.Close()
+		}
 	}
 }
 
@@ -37,6 +40,7 @@ func (g *Game) Update() error {
 
 	if ebiten.IsWindowBeingClosed() {
 		handleClose()
+		// An error must be returned to trigger the window closing once closing has been handled.
 		return errors.New("window has been closed")
 	}
 	// Handle updates for each game state.
