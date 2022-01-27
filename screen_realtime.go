@@ -25,7 +25,7 @@ type connectionElements struct {
 	channelAttach       button.Button
 	channelSubscribeAll button.Button
 	presenceInfo        text.Text
-	announcePresence    button.Button
+	enterPresence       button.Button
 	getPresence         button.Button
 	leavePresence       button.Button
 	eventInfo           text.Text
@@ -69,7 +69,7 @@ func initialiseConnectionElements(elements *connectionElements, id connectionID,
 	elements.channelAttach = button.NewButton(75, 30, attachText, 10, 20, colour.Black, font.MplusSmallFont, colour.ZingyGreen, 0, 0)
 	elements.channelSubscribeAll = button.NewButton(115, 30, subscribeAllText, 10, 20, colour.Black, font.MplusSmallFont, colour.ZingyGreen, 0, 0)
 	elements.presenceInfo = text.NewText("", colour.ElectricCyan, font.MplusSmallFont, 0, 0)
-	elements.announcePresence = button.NewButton(100, 30, announcePresenceText, 12, 20, colour.Black, font.MplusSmallFont, colour.ElectricCyan, 0, 0)
+	elements.enterPresence = button.NewButton(65, 30, enterPresenceText, 12, 20, colour.Black, font.MplusSmallFont, colour.ElectricCyan, 0, 0)
 	elements.getPresence = button.NewButton(50, 30, getPresenceText, 12, 20, colour.Black, font.MplusSmallFont, colour.ElectricCyan, 0, 0)
 	elements.leavePresence = button.NewButton(70, 30, leavePresenceText, 12, 20, colour.Black, font.MplusSmallFont, colour.ElectricCyan, 0, 0)
 	elements.eventInfo = text.NewText("", colour.White, font.MplusSmallFont, 0, 0)
@@ -215,10 +215,10 @@ func drawChannelInfo(screen *ebiten.Image, elements *connectionElements) {
 	elements.presenceInfo.SetY(button.Y + button.Height + 62)
 	elements.presenceInfo.Draw(screen)
 
-	// Draw the announce presence button.
-	elements.announcePresence.SetX(button.X + 442)
-	elements.announcePresence.SetY(button.Y + button.Height + 43)
-	elements.announcePresence.Draw(screen)
+	// Draw the enter presence button.
+	elements.enterPresence.SetX(button.X + 477)
+	elements.enterPresence.SetY(button.Y + button.Height + 43)
+	elements.enterPresence.Draw(screen)
 
 	// Draw the get presence button.
 	elements.getPresence.SetX(button.X + 543)
@@ -308,7 +308,7 @@ func updateConnectionElements(elements *connectionElements) {
 	updateSubscribeChannelButton(&elements.channelSubscribeAll, &elements.eventInfo, elements.id)
 
 	// Presence controls.
-	updateAnnouncePresenceButton(&elements.announcePresence, elements.id)
+	updateEnterPresenceButton(&elements.enterPresence, elements.id)
 	updateGetPresenceButton(&elements.getPresence, &elements.presenceInfo, elements.id)
 	updateLeavePresenceButton(&elements.leavePresence, elements.id)
 
@@ -514,9 +514,9 @@ func updateSubscribeChannelButton(button *button.Button, eventInfo *text.Text, i
 	}
 }
 
-// updateGetPresenceButton contains the update logic for each announce presence button.
-func updateAnnouncePresenceButton(button *button.Button, id connectionID) {
-	// Handle mouseover interaction with an announce presence button.
+// updateEnterPresenceButton contains the update logic for each enter presence button.
+func updateEnterPresenceButton(button *button.Button, id connectionID) {
+	// Handle mouseover interaction with an enter presence button.
 	if button.IsMouseOver() {
 		button.SetBgColour(colour.White)
 	} else {
@@ -529,12 +529,12 @@ func updateAnnouncePresenceButton(button *button.Button, id connectionID) {
 		// and the button is clicked
 		if inpututil.IsMouseButtonJustReleased(ebiten.MouseButtonLeft) && button.IsMouseOver() {
 
-			err := announcePresence(id)
+			err := enterPresence(id)
 			if err != nil {
 				infoBar.SetText(err.Error())
 				return
 			}
-			infoBar.SetText(announcePresenceSuccess)
+			infoBar.SetText(enterPresenceSuccess)
 		}
 	}
 }

@@ -180,8 +180,8 @@ func publishToChannel(id connectionID, messageName string, messageData interface
 	return nil
 }
 
-// announcePresence announces the presence of a client to a channel.
-func announcePresence(id connectionID) error {
+// enterPresence informs the channel that the client has entered the channel.
+func enterPresence(id connectionID) error {
 	// Set timeout to be default timeout
 	ctx, cancel := context.WithTimeout(connections[id].context, defaultTimeout)
 	defer cancel()
@@ -191,7 +191,7 @@ func announcePresence(id connectionID) error {
 		return err
 	}
 
-	log.Println(announcePresenceSuccess)
+	log.Println(enterPresenceSuccess)
 	return nil
 }
 

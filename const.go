@@ -28,16 +28,16 @@ const (
 	defaultMessageData = "data"
 
 	// Button text
-	createClientText     = "New Client"
-	setChannelText       = "Set Channel"
-	publishText          = "Publish"
-	detachText           = "Detach"
-	attachText           = "Attach"
-	subscribeAllText     = "Subscribe All"
-	unsubscribeText      = "Unsubscribe"
-	announcePresenceText = "Announce"
-	getPresenceText      = "Get"
-	leavePresenceText    = "Leave"
+	createClientText  = "New Client"
+	setChannelText    = "Set Channel"
+	publishText       = "Publish"
+	detachText        = "Detach"
+	attachText        = "Attach"
+	subscribeAllText  = "Subscribe All"
+	unsubscribeText   = "Unsubscribe"
+	enterPresenceText = "Enter"
+	getPresenceText   = "Get"
+	leavePresenceText = "Leave"
 
 	// Display text
 	channelNameText = "Channel"
@@ -57,7 +57,7 @@ const (
 	publishSuccess              = "Successfully published to channel."
 	subscribeAllSuccess         = "Successfully subscribed to all channel messages."
 	unsubscribeSuccess          = "Successfully unsubscribed from channel messages."
-	announcePresenceSuccess     = "Successfully announced presence."
+	enterPresenceSuccess        = "Successfully entered presence."
 	leavePresenceSuccess        = "Successfully removed presence."
 
 	// Async processes
