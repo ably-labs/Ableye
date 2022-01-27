@@ -28,10 +28,10 @@ A channel can be set on a client by inputting a channel name and left mouse clic
 
 Once a channel has been initialised, the channel can be subscribed to by clicking the `Subscribe All` button. After subscribing to a channel a window will appear to display events in realtime. It is also possible to attach or detach from the channel at any time by clicking on the `Attach` or `Detach` buttons.
 
-Presence can be interacted with using the `Announce`, `Get` and `Leave` buttons.
+Presence can be interacted with using the `Enter`, `Get` and `Leave` buttons.
 
 Message name and message data can be input and published to the channel using the `Publish` button.
 
 ## Known issues
 
-* The `Announce` button must sometimes be clicked twice for a client to be able to see their own presence in a channel. See https://github.com/ably/ably-go/issues/436
+* The `Enter` button must sometimes be clicked twice for a client to be able to see their own presence in a channel. See https://github.com/ably/ably-go/issues/436
