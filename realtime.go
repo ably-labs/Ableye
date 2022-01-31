@@ -64,13 +64,30 @@ func newConnection(client *ably.Realtime) connection {
 // A clientID is also set on the client.
 func createRealtimeClient(id connectionID) error {
 
-	newClient, err := ably.NewRealtime(
-		ably.WithKey(config.Cfg.Key),
-		ably.WithClientID(id.string()),
-	)
+	var newClient *ably.Realtime
 
-	if err != nil {
-		return err
+	if config.Cfg.DebugMode {
+		// Create a new client with debug logging turned on.
+		client, err := ably.NewRealtime(
+			ably.WithKey(config.Cfg.Key),
+			ably.WithClientID(id.string()),
+			ably.WithLogLevel(ably.LogDebug),
+		)
+		if err != nil {
+			return err
+		}
+		newClient = client
+
+	} else {
+		// Create a new client.
+		client, err := ably.NewRealtime(
+			ably.WithKey(config.Cfg.Key),
+			ably.WithClientID(id.string()),
+		)
+		if err != nil {
+			return err
+		}
+		newClient = client
 	}
 
 	connection := newConnection(newClient)
