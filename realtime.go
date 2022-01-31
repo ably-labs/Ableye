@@ -43,20 +43,50 @@ const (
 	clientD
 )
 
+type connectionType int
+
+const (
+	realtime connectionType = iota
+	rest
+)
+
+func (c connectionType) string() string {
+	switch int(c) {
+	case 0:
+		return "Realtime Client"
+	case 1:
+		return "Rest Client"
+	}
+	return ""
+}
+
 // connection represents a connection to the Ably platform.
 type connection struct {
-	context     context.Context
-	client      *ably.Realtime
-	channel     *ably.RealtimeChannel
-	unsubscribe *func()
+	context        context.Context
+	connectionType *connectionType
+	restClient     *ably.REST
+	client         *ably.Realtime
+	channel        *ably.RealtimeChannel
+	unsubscribe    *func()
 }
 
 // newConnection is a contructor to create a new connection.
-func newConnection(client *ably.Realtime) connection {
+func newConnection(client *ably.Realtime, conType connectionType) connection {
 	ctx := context.Background()
 	return connection{
-		context: ctx,
-		client:  client,
+		context:        ctx,
+		connectionType: &conType,
+		client:         client,
+	}
+}
+
+// newRestConnection is a contructor to create a new REST connection.
+func newRestConnection(client *ably.REST, conType connectionType) connection {
+	ctx := context.Background()
+	return connection{
+		context:        ctx,
+		connectionType: &conType,
+		restClient:     client,
 	}
 }
 
@@ -90,9 +120,28 @@ func createRealtimeClient(id connectionID) error {
 		newClient = client
 	}
 
-	connection := newConnection(newClient)
+	connection := newConnection(newClient, realtime)
 	connections[id] = &connection
 	log.Println(createRealtimeClientSuccess)
+
+	return nil
+}
+
+// createRestClient creates a new rest client and stores it in a connection.
+// A clientID is also set on the client.
+func createRestClient(id connectionID) error {
+
+	newClient, err := ably.NewREST(
+		ably.WithKey(config.Cfg.Key),
+		ably.WithClientID(id.string()),
+	)
+	if err != nil {
+		return err
+	}
+
+	connection := newRestConnection(newClient, rest)
+	connections[id] = &connection
+	log.Println(createRestClientSuccess)
 
 	return nil
 }
@@ -108,6 +157,19 @@ func closeRealtimeClient(id connectionID) {
 		connections[id] = nil
 
 		log.Println(closeRealtimeClientSuccess)
+	}
+}
+
+// closeRestClient closes an existing realtime client and removes the connection.
+func closeRestClient(id connectionID) {
+
+	if connections[id] != nil && connections[id].restClient != nil {
+
+		//Tear down the connection in internal memory.
+		connections[id].restClient = nil
+		connections[id] = nil
+
+		log.Println(closeRestClientSuccess)
 	}
 }
 

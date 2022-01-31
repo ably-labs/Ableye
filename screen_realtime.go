@@ -15,27 +15,29 @@ import (
 )
 
 type connectionElements struct {
-	id                  connectionID
-	createClient        button.Button
-	closeClient         button.Button
-	setChannel          button.Button
-	channelName         text.Text
-	channelStatus       text.Text
-	channelDetach       button.Button
-	channelAttach       button.Button
-	channelSubscribeAll button.Button
-	presenceInfo        text.Text
-	enterPresence       button.Button
-	getPresence         button.Button
-	leavePresence       button.Button
-	eventInfo           text.Text
-	channelNameLabel    text.Text
-	channelNameInput    textbox.TextBox
-	messageNameLabel    text.Text
-	messageNameInput    textbox.TextBox
-	messageDataLabel    text.Text
-	messageDataInput    textbox.TextBox
-	channelPublish      button.Button
+	id                   connectionID
+	createRealtimeClient button.Button
+	createRestClient     button.Button
+	clientLabel          button.Button
+	closeClient          button.Button
+	setChannel           button.Button
+	channelName          text.Text
+	channelStatus        text.Text
+	channelDetach        button.Button
+	channelAttach        button.Button
+	channelSubscribeAll  button.Button
+	presenceInfo         text.Text
+	enterPresence        button.Button
+	getPresence          button.Button
+	leavePresence        button.Button
+	eventInfo            text.Text
+	channelNameLabel     text.Text
+	channelNameInput     textbox.TextBox
+	messageNameLabel     text.Text
+	messageNameInput     textbox.TextBox
+	messageDataLabel     text.Text
+	messageDataInput     textbox.TextBox
+	channelPublish       button.Button
 }
 
 // The elements of the realtime screen.
@@ -61,7 +63,9 @@ func initialiseRealtimeScreen() {
 // and saves the connectionElement information in a global variable
 func initialiseConnectionElements(elements *connectionElements, id connectionID, x int, y int) {
 	elements.id = id
-	elements.createClient = button.NewButton(150, 35, createClientText, 22, 22, colour.Black, font.MplusSmallFont, colour.White, x, y)
+	elements.createRealtimeClient = button.NewButton(150, 35, createClientText, 16, 22, colour.Black, font.MplusSmallFont, colour.White, x, y)
+	elements.createRestClient = button.NewButton(150, 35, createRestClientText, 32, 22, colour.Black, font.MplusSmallFont, colour.White, x+151, y)
+	elements.clientLabel = button.NewButton(400, 35, "", 12, 22, colour.Black, font.MplusSmallFont, colour.ZingyGreen, x, y)
 	elements.closeClient = button.NewButton(35, 35, "X", 12, 22, colour.Black, font.MplusSmallFont, colour.BrightRed, 0, 0)
 	elements.channelName = text.NewText("", colour.ZingyGreen, font.MplusSmallFont, 0, 0)
 	elements.channelStatus = text.NewText("", colour.ZingyGreen, font.MplusSmallFont, 0, 0)
@@ -101,18 +105,37 @@ func drawConnectionElements(screen *ebiten.Image, elements *connectionElements) 
 
 	id := elements.id
 
-	// Draw the button to create a new client.
-	elements.createClient.Draw(screen)
+	// if there is no connection
+	if connections[id] == nil {
+		// draw the buttons that can create a connection with a client.
+		elements.createRealtimeClient.Draw(screen)
+		elements.createRestClient.Draw(screen)
+	}
 
 	// if client has been created
-	if connections[id] != nil && connections[id].client != nil {
-		drawClientInfo(screen, elements.createClient, &elements.closeClient)
+	if connections[id] != nil && (connections[id].client != nil || connections[id].restClient != nil) {
+
+		// move the client label to the location of the create realtime button
+		elements.clientLabel.X = elements.createRealtimeClient.X
+		elements.clientLabel.Y = elements.createRealtimeClient.Y
+		if elements.clientLabel.GetText() == "" {
+			if isRealtimeClient(id) {
+				elements.clientLabel.SetText(fmt.Sprintf("%s - %s", connections[id].client.Auth.ClientID(), connections[id].connectionType.string()))
+			}
+			if isRestClient(id) {
+				elements.clientLabel.SetText(fmt.Sprintf("%s - %s", connections[id].restClient.Auth.ClientID(), connections[id].connectionType.string()))
+			}
+		}
+
+		elements.clientLabel.Draw(screen)
+
+		drawClientInfo(screen, elements.clientLabel, &elements.closeClient)
 
 		elements.closeClient.Draw(screen)
 
 		// if a channel has not been set for this client, draw the elements required to set the channel.
 		if connections[id].channel == nil {
-			drawSetChannel(screen, elements.createClient, elements.channelNameLabel, &elements.channelNameInput, &elements.setChannel)
+			drawSetChannel(screen, elements.clientLabel, elements.channelNameLabel, &elements.channelNameInput, &elements.setChannel)
 		}
 	}
 
@@ -124,14 +147,14 @@ func drawConnectionElements(screen *ebiten.Image, elements *connectionElements) 
 	// if a channel has been subscribed an unsubscribe function will be saved in memory.
 	// if an unsubscribe function exists, draw event info
 	if connections[id] != nil && connections[id].unsubscribe != nil {
-		drawEventInfo(screen, elements.createClient, &elements.eventInfo)
+		drawEventInfo(screen, elements.clientLabel, &elements.eventInfo)
 	}
 }
 
 // drawClientInfo draws the client window and the close client button.
-func drawClientInfo(screen *ebiten.Image, createClient button.Button, closeClient *button.Button) {
-	// Elements are drawn in locations that are calculated from the location of the create client button.
-	button := createClient
+func drawClientInfo(screen *ebiten.Image, clientLabel button.Button, closeClient *button.Button) {
+	// Elements are drawn in locations that are calculated from the location of the client label.
+	button := clientLabel
 
 	// Draw a window which is made from two overlapping images.
 	ebitenutil.DrawRect(screen, float64(button.X), float64(button.Y)+float64(button.Height), (screenWidth/2)-10, screenHeight/3, colour.ZingyGreen)
@@ -143,9 +166,9 @@ func drawClientInfo(screen *ebiten.Image, createClient button.Button, closeClien
 	closeClient.Draw(screen)
 }
 
-func drawSetChannel(screen *ebiten.Image, createClient button.Button, channelNameLabel text.Text, channelNameInput *textbox.TextBox, setChannel *button.Button) {
-	// Elements are drawn in locations that are calculated from the location of the create client button.
-	button := createClient
+func drawSetChannel(screen *ebiten.Image, clientLabel button.Button, channelNameLabel text.Text, channelNameInput *textbox.TextBox, setChannel *button.Button) {
+	// Elements are drawn in locations that are calculated from the location of the client label.
+	button := clientLabel
 
 	// Channel name label.
 	channelNameLabel.SetX(button.X + 10)
@@ -165,8 +188,8 @@ func drawSetChannel(screen *ebiten.Image, createClient button.Button, channelNam
 
 // drawChannelInfo draws the channel window, the presence window and message controls.
 func drawChannelInfo(screen *ebiten.Image, elements *connectionElements) {
-	// Elements are drawn in locations that are calculated from the location of the create client button.
-	button := elements.createClient
+	// Elements are drawn in locations that are calculated from the location of the client label.
+	button := elements.clientLabel
 	id := elements.id
 
 	// Draw the channel window.
@@ -257,10 +280,10 @@ func drawChannelInfo(screen *ebiten.Image, elements *connectionElements) {
 }
 
 // drawEventInfo draws the event window.
-func drawEventInfo(screen *ebiten.Image, createClient button.Button, eventInfo *text.Text) {
+func drawEventInfo(screen *ebiten.Image, clientLabel button.Button, eventInfo *text.Text) {
 
-	// Elements are drawn in locations that are calculated from the location of the create client button.
-	button := createClient
+	// Elements are drawn in locations that are calculated from the location of the client label.
+	button := clientLabel
 
 	// Draw the event window.
 	ebitenutil.DrawRect(screen, float64(button.X)+4, float64(button.Y)+float64(button.Height)+182, (screenWidth/2)-18, screenHeight/12, colour.White)
@@ -295,8 +318,9 @@ func updateRealtimeScreen() {
 // updateConnectionElements updates all the elements for a connection.
 func updateConnectionElements(elements *connectionElements) {
 	// Client elements.
-	updateCreateClientButton(&elements.createClient, elements.id)
-	updateCloseClientButton(&elements.closeClient, &elements.createClient, &elements.presenceInfo, &elements.eventInfo, elements.id)
+	updateCreateRealtimeClientButton(&elements.createRealtimeClient, elements.id)
+	updateCreateRestClientButton(&elements.createRestClient, elements.id)
+	updateCloseClientButton(&elements.closeClient, &elements.clientLabel, &elements.presenceInfo, &elements.eventInfo, elements.id)
 
 	// Set channel elements.
 	updateTextInputBox(&elements.channelNameInput, elements.id)
@@ -318,8 +342,8 @@ func updateConnectionElements(elements *connectionElements) {
 	updateChannelPublishButton(&elements.channelPublish, elements.messageNameInput.GetText(), elements.messageDataInput.GetText(), elements.id)
 }
 
-// updateCreateClientButton contains the update logic for each client creation button.
-func updateCreateClientButton(button *button.Button, id connectionID) {
+// updateCreateRealtimeClientButton contains the update logic for each realtime client creation button.
+func updateCreateRealtimeClientButton(button *button.Button, id connectionID) {
 	// Handle mouseover interaction with create button while a connection does not exist.
 	if button.IsMouseOver() && connections[id] == nil {
 		button.SetBgColour(colour.ZingyGreen)
@@ -330,23 +354,44 @@ func updateCreateClientButton(button *button.Button, id connectionID) {
 		button.SetBgColour(colour.White)
 	}
 
-	// Handle mouse click on a create client button
+	// Handle mouse click on a create realtime client button.
 	if inpututil.IsMouseButtonJustReleased(ebiten.MouseButtonLeft) && button.IsMouseOver() {
 		if connections[id] == nil {
 			if err := createRealtimeClient(id); err != nil {
 				infoBar.SetText(err.Error())
 			}
 			infoBar.SetText(createRealtimeClientSuccess)
-			button.SetBgColour(colour.ZingyGreen)
-			button.SetText(id.string())
+		}
+	}
+}
+
+// updateCreateRestClientButton contains the update logic for each realtime client creation button.
+func updateCreateRestClientButton(button *button.Button, id connectionID) {
+	// Handle mouseover interaction with create button while a connection does not exist.
+	if button.IsMouseOver() && connections[id] == nil {
+		button.SetBgColour(colour.ZingyGreen)
+	}
+
+	// if the button is not moused over and there is no connection.
+	if !button.IsMouseOver() && connections[id] == nil {
+		button.SetBgColour(colour.White)
+	}
+
+	// Handle mouse click on a create rest client button.
+	if inpututil.IsMouseButtonJustReleased(ebiten.MouseButtonLeft) && button.IsMouseOver() {
+		if connections[id] == nil {
+			if err := createRestClient(id); err != nil {
+				infoBar.SetText(err.Error())
+			}
+			infoBar.SetText(createRestClientSuccess)
 		}
 	}
 }
 
 // updateCloseClientButton contains the update logic for each close client button.
-// a createButton, presenceInfo and eventInfo are passed to this function so they
+// a clientLabel, presenceInfo and eventInfo are passed to this function so they
 // can be reset when a client is closed.
-func updateCloseClientButton(closeButton *button.Button, createButton *button.Button, presenceInfo *text.Text, eventInfo *text.Text, id connectionID) {
+func updateCloseClientButton(closeButton *button.Button, clientLabel *button.Button, presenceInfo *text.Text, eventInfo *text.Text, id connectionID) {
 	// Handle mouseover interaction with a close client button.
 	if closeButton.IsMouseOver() {
 		closeButton.SetTextColour(colour.White)
@@ -356,11 +401,21 @@ func updateCloseClientButton(closeButton *button.Button, createButton *button.Bu
 
 	// Handle mouse click on a close client button.
 	if inpututil.IsMouseButtonJustReleased(ebiten.MouseButtonLeft) && closeButton.IsMouseOver() {
-		closeRealtimeClient(id)
-		infoBar.SetText(closeRealtimeClientSuccess)
-		// Reset the create button once a client is closed.
-		createButton.SetBgColour(colour.ZingyGreen)
-		createButton.SetText(createClientText)
+
+		// if a realtime client is being closed.
+		if isRealtimeClient(id) {
+			closeRealtimeClient(id)
+			infoBar.SetText(closeRealtimeClientSuccess)
+		}
+
+		// if a rest client is being closed
+		if isRestClient(id) {
+			closeRestClient(id)
+			infoBar.SetText(closeRealtimeClientSuccess)
+		}
+
+		// Reset the client label.
+		clientLabel.SetText("")
 
 		// Reset the presence text once a client is closed.
 		presenceInfo.Reset()
@@ -595,4 +650,14 @@ func updateTextInputBox(textBox *textbox.TextBox, id connectionID) {
 	}
 
 	textBox.Update()
+}
+
+// isRealtimeClient is a helper function that returns true if a connection exists for an ID and it's type is realtime.
+func isRealtimeClient(id connectionID) bool {
+	return connections[id] != nil && connections[id].connectionType != nil && *connections[id].connectionType == realtime
+}
+
+// isRestClient is a helper function that returns true if a connection exists for an ID and it's type is rest.
+func isRestClient(id connectionID) bool {
+	return connections[id] != nil && connections[id].connectionType != nil && *connections[id].connectionType == rest
 }
