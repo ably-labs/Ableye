@@ -63,7 +63,7 @@ func initialiseRealtimeScreen() {
 // and saves the connectionElement information in a global variable
 func initialiseConnectionElements(elements *connectionElements, id connectionID, x int, y int) {
 	elements.id = id
-	elements.createRealtimeClient = button.NewButton(150, 35, createClientText, 16, 22, colour.Black, font.MplusSmallFont, colour.White, x, y)
+	elements.createRealtimeClient = button.NewButton(150, 35, createRealtimeClientText, 16, 22, colour.Black, font.MplusSmallFont, colour.White, x, y)
 	elements.createRestClient = button.NewButton(150, 35, createRestClientText, 32, 22, colour.Black, font.MplusSmallFont, colour.White, x+151, y)
 	elements.clientLabel = button.NewButton(400, 35, "", 12, 22, colour.Black, font.MplusSmallFont, colour.ZingyGreen, x, y)
 	elements.closeClient = button.NewButton(35, 35, "X", 12, 22, colour.Black, font.MplusSmallFont, colour.BrightRed, 0, 0)
@@ -107,7 +107,7 @@ func drawConnectionElements(screen *ebiten.Image, elements *connectionElements) 
 
 	// if there is no connection
 	if connections[id] == nil {
-		// draw the buttons that can create a connection with a client.
+		// Draw the buttons that can create a connection with a client.
 		elements.createRealtimeClient.Draw(screen)
 		elements.createRestClient.Draw(screen)
 	}
@@ -115,7 +115,7 @@ func drawConnectionElements(screen *ebiten.Image, elements *connectionElements) 
 	// if client has been created
 	if connections[id] != nil && (connections[id].realtimeClient != nil || connections[id].restClient != nil) {
 
-		// move the client label to the location of the create realtime button
+		// Move the client label to the location of the create realtime button.
 		elements.clientLabel.X = elements.createRealtimeClient.X
 		elements.clientLabel.Y = elements.createRealtimeClient.Y
 		if elements.clientLabel.GetText() == "" {
@@ -133,20 +133,19 @@ func drawConnectionElements(screen *ebiten.Image, elements *connectionElements) 
 
 		elements.closeClient.Draw(screen)
 
-		// if a channel has not been set for this client, draw the elements required to set the channel.
+		// If a channel has not been set for this client, draw the elements required to set the channel.
 		if (isRealtimeClient(id) && connections[id].realtimeChannel == nil) || (isRestClient(id) && connections[id].restChannel == nil) {
 			drawSetChannel(screen, elements.clientLabel, elements.channelNameLabel, &elements.channelNameInput, &elements.setChannel)
 		}
 	}
 
-	// if client channel has been created
+	// If client channel has been created.
 	if (isRealtimeClient(id) && connections[id].realtimeChannel != nil) || (isRestClient(id) && connections[id].restChannel != nil) {
-		//	if connections[id] != nil && connections[id].realtimeChannel != nil {
 		drawChannelInfo(screen, elements)
 	}
 
-	// if a channel has been subscribed an unsubscribe function will be saved in memory.
-	// if an unsubscribe function exists, draw event info
+	// If a channel has been subscribed an unsubscribe function will be saved in memory.
+	// If an unsubscribe function exists, draw event info.
 	if connections[id] != nil && connections[id].unsubscribe != nil {
 		drawEventInfo(screen, elements.clientLabel, &elements.eventInfo)
 	}
@@ -247,20 +246,23 @@ func drawChannelInfo(screen *ebiten.Image, elements *connectionElements) {
 	elements.presenceInfo.SetY(button.Y + button.Height + 62)
 	elements.presenceInfo.Draw(screen)
 
-	// Draw the enter presence button.
-	elements.enterPresence.SetX(button.X + 477)
-	elements.enterPresence.SetY(button.Y + button.Height + 43)
-	elements.enterPresence.Draw(screen)
-
 	// Draw the get presence button.
 	elements.getPresence.SetX(button.X + 543)
 	elements.getPresence.SetY(button.Y + button.Height + 43)
 	elements.getPresence.Draw(screen)
 
-	// Draw the leave presence button.
-	elements.leavePresence.SetX(button.X + 594)
-	elements.leavePresence.SetY(button.Y + button.Height + 43)
-	elements.leavePresence.Draw(screen)
+	// Enter and leave presence are only applicable to the realtime client.
+	if isRealtimeClient(id) {
+		// Draw the enter presence button.
+		elements.enterPresence.SetX(button.X + 477)
+		elements.enterPresence.SetY(button.Y + button.Height + 43)
+		elements.enterPresence.Draw(screen)
+
+		// Draw the leave presence button.
+		elements.leavePresence.SetX(button.X + 594)
+		elements.leavePresence.SetY(button.Y + button.Height + 43)
+		elements.leavePresence.Draw(screen)
+	}
 
 	// Draw the message name label.
 	elements.messageNameLabel.SetX(button.X + 10)
@@ -411,13 +413,13 @@ func updateCloseClientButton(closeButton *button.Button, clientLabel *button.But
 	// Handle mouse click on a close client button.
 	if inpututil.IsMouseButtonJustReleased(ebiten.MouseButtonLeft) && closeButton.IsMouseOver() {
 
-		// if a realtime client is being closed.
+		// If a realtime client is being closed.
 		if isRealtimeClient(id) {
 			closeRealtimeClient(id)
 			infoBar.SetText(closeRealtimeClientSuccess)
 		}
 
-		// if a rest client is being closed
+		// If a rest client is being closed.
 		if isRestClient(id) {
 			closeRestClient(id)
 			infoBar.SetText(closeRealtimeClientSuccess)
@@ -487,7 +489,7 @@ func updateChannelPublishButton(button *button.Button, messageName string, messa
 	}
 }
 
-// updateChannelDetachhButton contains the update logic for each channel attach button.
+// updateChannelDetachButton contains the update logic for each channel attach button.
 func updateChannelDetachButton(button *button.Button, id connectionID) {
 	// Handle mouseover interaction with a channel attach button.
 	if button.IsMouseOver() {
@@ -496,11 +498,10 @@ func updateChannelDetachButton(button *button.Button, id connectionID) {
 		button.SetBgColour(colour.ZingyGreen)
 	}
 
-	// if a connection exists that has a channel
-	if connections[id] != nil && connections[id].realtimeChannel != nil {
-
-		// and this button has been clicked.
-		if inpututil.IsMouseButtonJustReleased(ebiten.MouseButtonLeft) && button.IsMouseOver() {
+	// If the detach channel button has been clicked.
+	if inpututil.IsMouseButtonJustReleased(ebiten.MouseButtonLeft) && button.IsMouseOver() {
+		// If a connection exists that has a realtime channel.
+		if connections[id] != nil && connections[id].realtimeChannel != nil {
 			err := detachChannel(id)
 			if err != nil {
 				infoBar.SetText(err.Error())
@@ -520,11 +521,10 @@ func updateChannelAttachButton(button *button.Button, id connectionID) {
 		button.SetBgColour(colour.ZingyGreen)
 	}
 
-	// if a connection exists that has a channel
-	if connections[id] != nil && connections[id].realtimeChannel != nil {
-
-		// and this button has been clicked.
-		if inpututil.IsMouseButtonJustReleased(ebiten.MouseButtonLeft) && button.IsMouseOver() {
+	// If the attach channel button has been clicked.
+	if inpututil.IsMouseButtonJustReleased(ebiten.MouseButtonLeft) && button.IsMouseOver() {
+		// if a connection exists that has a realtime channel.
+		if connections[id] != nil && connections[id].realtimeChannel != nil {
 			err := attachChannel(id)
 			if err != nil {
 				infoBar.SetText(err.Error())
@@ -597,11 +597,10 @@ func updateEnterPresenceButton(button *button.Button, id connectionID) {
 		button.SetBgColour(colour.ElectricCyan)
 	}
 
-	// if a connection exists that has a channel
-	if connections[id] != nil && connections[id].realtimeChannel != nil {
-
-		// and the button is clicked
-		if inpututil.IsMouseButtonJustReleased(ebiten.MouseButtonLeft) && button.IsMouseOver() {
+	// If the enter presence button is clicked.
+	if inpututil.IsMouseButtonJustReleased(ebiten.MouseButtonLeft) && button.IsMouseOver() {
+		// and a connection exists that has a realtime channel
+		if connections[id] != nil && connections[id].realtimeChannel != nil {
 
 			err := enterPresence(id)
 			if err != nil {
@@ -644,10 +643,10 @@ func updateLeavePresenceButton(button *button.Button, id connectionID) {
 		button.SetBgColour(colour.ElectricCyan)
 	}
 
-	// if a connection exists that has a channel
-	if connections[id] != nil && connections[id].realtimeChannel != nil {
-		// and the button is clicked
-		if inpututil.IsMouseButtonJustReleased(ebiten.MouseButtonLeft) && button.IsMouseOver() {
+	// If the leave presence button is clicked.
+	if inpututil.IsMouseButtonJustReleased(ebiten.MouseButtonLeft) && button.IsMouseOver() {
+		// and a connection exists that has a realtime channel.
+		if connections[id] != nil && connections[id].realtimeChannel != nil {
 			err := leavePresence(id)
 			if err != nil {
 				infoBar.SetText(err.Error())

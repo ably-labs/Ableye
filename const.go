@@ -28,17 +28,17 @@ const (
 	defaultMessageData = "data"
 
 	// Button text
-	createClientText     = "Realtime Client"
-	createRestClientText = "Rest Client"
-	setChannelText       = "Set Channel"
-	publishText          = "Publish"
-	detachText           = "Detach"
-	attachText           = "Attach"
-	subscribeAllText     = "Subscribe All"
-	unsubscribeText      = "Unsubscribe"
-	enterPresenceText    = "Enter"
-	getPresenceText      = "Get"
-	leavePresenceText    = "Leave"
+	createRealtimeClientText = "Realtime Client"
+	createRestClientText     = "Rest Client"
+	setChannelText           = "Set Channel"
+	publishText              = "Publish"
+	detachText               = "Detach"
+	attachText               = "Attach"
+	subscribeAllText         = "Subscribe All"
+	unsubscribeText          = "Unsubscribe"
+	enterPresenceText        = "Enter"
+	getPresenceText          = "Get"
+	leavePresenceText        = "Leave"
 
 	// Display text
 	channelNameText = "Channel"

@@ -65,7 +65,7 @@ func publishToRestChannel(id connectionID, messageName string, messageData inter
 	return nil
 }
 
-// getRealtimePresence sets the presence info text box to presence information.
+// getRestPresence sets the presence info text box to presence information.
 func getRestPresence(id connectionID, presenceInfo *text.Text) {
 	var buffer bytes.Buffer
 

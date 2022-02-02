@@ -22,16 +22,30 @@ Run the executable with `./Ableye`
 
 ## Exploring Ably Realtime
 
-Left mouse click on the `New Client` buttons to create up to 4 realtime clients.
+A new client can be created by left mouse click on either `Realtime Client` or `Rest client`. Up to 4 clients can be created simultaneously.
 
-A channel can be set on a client by inputting a channel name and left mouse clicking the `Set Channel` button.
+### Realtime Client
 
-Once a channel has been initialised, the channel can be subscribed to by clicking the `Subscribe All` button. After subscribing to a channel a window will appear to display events in realtime. It is also possible to attach or detach from the channel at any time by clicking on the `Attach` or `Detach` buttons.
+After creating a realtime client, a channel can be set by inputting a channel name then left mouse clicking on the `Set Channel` button.
+
+Once a channel has been initialised, it can be subscribed to by clicking the `Subscribe All` button. After subscribing to a channel a window will appear to display events in realtime. While subscribed, an `Unsubscribe` button will be displayed which can be used to unsubscribe. It is also possible to attach or detach from the channel at any time by clicking on the `Attach` or `Detach` buttons.
 
 Presence can be interacted with using the `Enter`, `Get` and `Leave` buttons.
 
 Message name and message data can be input and published to the channel using the `Publish` button.
 
+### Rest Client
+
+The rest client support a smaller number of features than the realtime client.
+
+After creating a rest client, a channel can be set by inputting a channel name then left mouse clicking on the `Set Channel` button.
+
+It is possibly to get the channel presence by clicking on the `Get` button. 
+
+Message name and message data can be input and published to the channel using the `Publish` button.
+
+Please note that the rest client does not support entering and leaving a channel. The rest client also does not support subscribing to a channel.
+
 ## Known issues
 
-* The `Enter` button must sometimes be clicked twice for a client to be able to see their own presence in a channel. See https://github.com/ably/ably-go/issues/436
+* For a realtime client, the `Enter` button must sometimes be clicked twice for a client to be able to see their own presence in a channel. See https://github.com/ably/ably-go/issues/436
