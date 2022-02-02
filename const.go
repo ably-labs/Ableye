@@ -19,7 +19,7 @@ const (
 	realtimeText = "Explore Ably Realtime"
 
 	/////////////////////////
-	// Ably Realtime Screen.
+	// Ably Client Screen.
 	/////////////////////////
 
 	// Default input text box contents.
