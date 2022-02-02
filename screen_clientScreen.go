@@ -468,15 +468,15 @@ func updateChannelPublishButton(button *button.Button, messageName string, messa
 
 	// If this button has been clicked.
 	if inpututil.IsMouseButtonJustReleased(ebiten.MouseButtonLeft) && button.IsMouseOver() {
-		// Publish to the realtime channel if the client is a realtime client.
-		if isRealtimeClient(id) {
+		// Publish to the realtime channel if the client is a realtime client and a channel exists.
+		if isRealtimeClient(id) && connections[id].realtimeChannel != nil {
 			if err := publishToRealtimeChannel(id, messageName, messageData); err != nil {
 				infoBar.SetText(err.Error())
 				return
 			}
 		}
-		// Publish to the rest channel if the client is a rest client.
-		if isRestClient(id) {
+		// Publish to the rest channel if the client is a rest client and a channel exists.
+		if isRestClient(id) && connections[id].restChannel != nil {
 			if err := publishToRestChannel(id, messageName, messageData); err != nil {
 				infoBar.SetText(err.Error())
 				return
@@ -622,13 +622,15 @@ func updateGetPresenceButton(button *button.Button, text *text.Text, id connecti
 		button.SetBgColour(colour.ElectricCyan)
 	}
 
-	// if a connection exists that has a channel
-	if connections[id] != nil && connections[id].realtimeChannel != nil {
-
-		// and the button is clicked
-		if inpututil.IsMouseButtonJustReleased(ebiten.MouseButtonLeft) && button.IsMouseOver() {
-			// the call to get presence is async to prevent blocking.
-			go getPresence(id, text)
+	// If the get presence button is clicked
+	if inpututil.IsMouseButtonJustReleased(ebiten.MouseButtonLeft) && button.IsMouseOver() {
+		// Get presence for the realtime channel if the client is a realtime client and a channel exists.
+		if isRealtimeClient(id) && connections[id].realtimeChannel != nil {
+			go getRealtimePresence(id, text)
+			return
+		}
+		if isRestClient(id) && connections[id].restChannel != nil {
+			go getRestPresence(id, text)
 		}
 	}
 }

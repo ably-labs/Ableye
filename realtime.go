@@ -163,8 +163,8 @@ func enterPresence(id connectionID) error {
 	return nil
 }
 
-// getPresence sets the presence info text box to presence information.
-func getPresence(id connectionID, presenceInfo *text.Text) {
+// getRealtimePresence sets the presence info text box to presence information.
+func getRealtimePresence(id connectionID, presenceInfo *text.Text) {
 	var buffer bytes.Buffer
 
 	log.Println(startGetPresence)
