@@ -113,14 +113,14 @@ func drawConnectionElements(screen *ebiten.Image, elements *connectionElements) 
 	}
 
 	// if client has been created
-	if connections[id] != nil && (connections[id].client != nil || connections[id].restClient != nil) {
+	if connections[id] != nil && (connections[id].realtimeClient != nil || connections[id].restClient != nil) {
 
 		// move the client label to the location of the create realtime button
 		elements.clientLabel.X = elements.createRealtimeClient.X
 		elements.clientLabel.Y = elements.createRealtimeClient.Y
 		if elements.clientLabel.GetText() == "" {
 			if isRealtimeClient(id) {
-				elements.clientLabel.SetText(fmt.Sprintf("%s - %s", connections[id].client.Auth.ClientID(), connections[id].connectionType.string()))
+				elements.clientLabel.SetText(fmt.Sprintf("%s - %s", connections[id].realtimeClient.Auth.ClientID(), connections[id].connectionType.string()))
 			}
 			if isRestClient(id) {
 				elements.clientLabel.SetText(fmt.Sprintf("%s - %s", connections[id].restClient.Auth.ClientID(), connections[id].connectionType.string()))
@@ -134,13 +134,14 @@ func drawConnectionElements(screen *ebiten.Image, elements *connectionElements) 
 		elements.closeClient.Draw(screen)
 
 		// if a channel has not been set for this client, draw the elements required to set the channel.
-		if connections[id].channel == nil {
+		if (isRealtimeClient(id) && connections[id].realtimeChannel == nil) || (isRestClient(id) && connections[id].restChannel == nil) {
 			drawSetChannel(screen, elements.clientLabel, elements.channelNameLabel, &elements.channelNameInput, &elements.setChannel)
 		}
 	}
 
 	// if client channel has been created
-	if connections[id] != nil && connections[id].channel != nil {
+	if (isRealtimeClient(id) && connections[id].realtimeChannel != nil) || (isRestClient(id) && connections[id].restChannel != nil) {
+		//	if connections[id] != nil && connections[id].realtimeChannel != nil {
 		drawChannelInfo(screen, elements)
 	}
 
@@ -199,29 +200,37 @@ func drawChannelInfo(screen *ebiten.Image, elements *connectionElements) {
 	// Draw the channel name text box.
 	elements.channelName.SetX(button.X + 10)
 	elements.channelName.SetY(button.Y + button.Height + 25)
-	elements.channelName.SetText(fmt.Sprintf("%s : %s", channelNameText, connections[id].channel.Name))
+	if isRealtimeClient(id) {
+		elements.channelName.SetText(fmt.Sprintf("%s : %s", channelNameText, connections[id].realtimeChannel.Name))
+	}
+	if isRestClient(id) {
+		elements.channelName.SetText(fmt.Sprintf("%s : %s", channelNameText, connections[id].restChannel.Name))
+	}
 	elements.channelName.Draw(screen)
 
-	// Draw the channel status text box.
-	elements.channelStatus.SetX(button.X + 230)
-	elements.channelStatus.SetY(button.Y + button.Height + 25)
-	elements.channelStatus.SetText(fmt.Sprintf("Status : %s", connections[id].channel.State()))
-	elements.channelStatus.Draw(screen)
+	// Channel status, attach, detach and subscribe are only applicable to the realtime client.
+	if isRealtimeClient(id) {
+		// Draw the channel status text box.
+		elements.channelStatus.SetX(button.X + 230)
+		elements.channelStatus.SetY(button.Y + button.Height + 25)
+		elements.channelStatus.SetText(fmt.Sprintf("Status : %s", connections[id].realtimeChannel.State()))
+		elements.channelStatus.Draw(screen)
 
-	//Draw the channel detach button.
-	elements.channelDetach.SetX(button.X + 401)
-	elements.channelDetach.SetY(button.Y + button.Height + 4)
-	elements.channelDetach.Draw(screen)
+		//Draw the channel detach button.
+		elements.channelDetach.SetX(button.X + 401)
+		elements.channelDetach.SetY(button.Y + button.Height + 4)
+		elements.channelDetach.Draw(screen)
 
-	//Draw the channel attach button.
-	elements.channelAttach.SetX(button.X + 477)
-	elements.channelAttach.SetY(button.Y + button.Height + 4)
-	elements.channelAttach.Draw(screen)
+		//Draw the channel attach button.
+		elements.channelAttach.SetX(button.X + 477)
+		elements.channelAttach.SetY(button.Y + button.Height + 4)
+		elements.channelAttach.Draw(screen)
 
-	// Draw the channel subscribe/unsubscribe button.
-	elements.channelSubscribeAll.SetX(button.X + 553)
-	elements.channelSubscribeAll.SetY(button.Y + button.Height + 4)
-	elements.channelSubscribeAll.Draw(screen)
+		// Draw the channel subscribe/unsubscribe button.
+		elements.channelSubscribeAll.SetX(button.X + 553)
+		elements.channelSubscribeAll.SetY(button.Y + button.Height + 4)
+		elements.channelSubscribeAll.Draw(screen)
+	}
 
 	// Draw the presence window.
 	ebitenutil.DrawRect(screen, float64(button.X)+8, float64(button.Y)+float64(button.Height)+42, (screenWidth/2)-26, screenHeight/24, colour.ElectricCyan)
@@ -436,10 +445,14 @@ func updateSetChannelButton(button *button.Button, channelName string, id connec
 
 	// Handle mouse click on set channel button.
 	if inpututil.IsMouseButtonJustReleased(ebiten.MouseButtonLeft) && button.IsMouseOver() {
-		// if the connection exists and does not have a channel.
-		if connections[id] != nil && connections[id].channel == nil {
-			setChannel(channelName, id)
-			infoBar.SetText(setChannelSuccess)
+		if isRealtimeClient(id) && connections[id].realtimeChannel == nil {
+			realtimeSetChannel(channelName, id)
+			infoBar.SetText(setRealtimeChannelSuccess)
+		}
+
+		if isRestClient(id) && connections[id].restChannel == nil {
+			restSetChannel(channelName, id)
+			infoBar.SetText(setRestChannelSuccess)
 		}
 	}
 }
@@ -453,18 +466,24 @@ func updateChannelPublishButton(button *button.Button, messageName string, messa
 		button.SetBgColour(colour.JazzyPink)
 	}
 
-	// if a connection exists that has a channel
-	if connections[id] != nil && connections[id].channel != nil {
-
-		// and this button has been clicked.
-		if inpututil.IsMouseButtonJustReleased(ebiten.MouseButtonLeft) && button.IsMouseOver() {
-			err := publishToChannel(id, messageName, messageData)
-			if err != nil {
+	// If this button has been clicked.
+	if inpututil.IsMouseButtonJustReleased(ebiten.MouseButtonLeft) && button.IsMouseOver() {
+		// Publish to the realtime channel if the client is a realtime client.
+		if isRealtimeClient(id) {
+			if err := publishToRealtimeChannel(id, messageName, messageData); err != nil {
 				infoBar.SetText(err.Error())
 				return
 			}
-			infoBar.SetText(publishSuccess)
 		}
+		// Publish to the rest channel if the client is a rest client.
+		if isRestClient(id) {
+			if err := publishToRestChannel(id, messageName, messageData); err != nil {
+				infoBar.SetText(err.Error())
+				return
+			}
+		}
+
+		infoBar.SetText(publishSuccess)
 	}
 }
 
@@ -478,7 +497,7 @@ func updateChannelDetachButton(button *button.Button, id connectionID) {
 	}
 
 	// if a connection exists that has a channel
-	if connections[id] != nil && connections[id].channel != nil {
+	if connections[id] != nil && connections[id].realtimeChannel != nil {
 
 		// and this button has been clicked.
 		if inpututil.IsMouseButtonJustReleased(ebiten.MouseButtonLeft) && button.IsMouseOver() {
@@ -502,7 +521,7 @@ func updateChannelAttachButton(button *button.Button, id connectionID) {
 	}
 
 	// if a connection exists that has a channel
-	if connections[id] != nil && connections[id].channel != nil {
+	if connections[id] != nil && connections[id].realtimeChannel != nil {
 
 		// and this button has been clicked.
 		if inpututil.IsMouseButtonJustReleased(ebiten.MouseButtonLeft) && button.IsMouseOver() {
@@ -539,9 +558,9 @@ func updateSubscribeChannelButton(button *button.Button, eventInfo *text.Text, i
 	if inpututil.IsMouseButtonJustReleased(ebiten.MouseButtonLeft) && button.IsMouseOver() {
 
 		// if a channel exists and the connection has no unsubscribe function saved
-		if connections[id] != nil && connections[id].channel != nil && connections[id].unsubscribe == nil {
+		if connections[id] != nil && connections[id].realtimeChannel != nil && connections[id].unsubscribe == nil {
 
-			unsubscribeAll, err := subscribeAll(id, eventInfo)
+			unsubscribeAll, err := realtimeSubscribeAll(id, eventInfo)
 			if err != nil {
 				infoBar.SetText(err.Error())
 				return
@@ -579,7 +598,7 @@ func updateEnterPresenceButton(button *button.Button, id connectionID) {
 	}
 
 	// if a connection exists that has a channel
-	if connections[id] != nil && connections[id].channel != nil {
+	if connections[id] != nil && connections[id].realtimeChannel != nil {
 
 		// and the button is clicked
 		if inpututil.IsMouseButtonJustReleased(ebiten.MouseButtonLeft) && button.IsMouseOver() {
@@ -604,7 +623,7 @@ func updateGetPresenceButton(button *button.Button, text *text.Text, id connecti
 	}
 
 	// if a connection exists that has a channel
-	if connections[id] != nil && connections[id].channel != nil {
+	if connections[id] != nil && connections[id].realtimeChannel != nil {
 
 		// and the button is clicked
 		if inpututil.IsMouseButtonJustReleased(ebiten.MouseButtonLeft) && button.IsMouseOver() {
@@ -624,7 +643,7 @@ func updateLeavePresenceButton(button *button.Button, id connectionID) {
 	}
 
 	// if a connection exists that has a channel
-	if connections[id] != nil && connections[id].channel != nil {
+	if connections[id] != nil && connections[id].realtimeChannel != nil {
 		// and the button is clicked
 		if inpututil.IsMouseButtonJustReleased(ebiten.MouseButtonLeft) && button.IsMouseOver() {
 			err := leavePresence(id)

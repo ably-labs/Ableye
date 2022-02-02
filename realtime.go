@@ -11,85 +11,6 @@ import (
 	ably "github.com/ably/ably-go/ably"
 )
 
-func init() {
-	// Initialise a map to store connections to the ably platform.
-	connections = make(map[connectionID]*connection)
-}
-
-var (
-	connections map[connectionID]*connection
-)
-
-type connectionID int
-
-func (c connectionID) string() string {
-	switch int(c) {
-	case 0:
-		return "Client A"
-	case 1:
-		return "Client B"
-	case 2:
-		return "Client C"
-	case 3:
-		return "Client D"
-	}
-	return ""
-}
-
-const (
-	clientA connectionID = iota
-	clientB
-	clientC
-	clientD
-)
-
-type connectionType int
-
-const (
-	realtime connectionType = iota
-	rest
-)
-
-func (c connectionType) string() string {
-	switch int(c) {
-	case 0:
-		return "Realtime Client"
-	case 1:
-		return "Rest Client"
-	}
-	return ""
-}
-
-// connection represents a connection to the Ably platform.
-type connection struct {
-	context        context.Context
-	connectionType *connectionType
-	restClient     *ably.REST
-	client         *ably.Realtime
-	channel        *ably.RealtimeChannel
-	unsubscribe    *func()
-}
-
-// newConnection is a contructor to create a new connection.
-func newConnection(client *ably.Realtime, conType connectionType) connection {
-	ctx := context.Background()
-	return connection{
-		context:        ctx,
-		connectionType: &conType,
-		client:         client,
-	}
-}
-
-// newRestConnection is a contructor to create a new REST connection.
-func newRestConnection(client *ably.REST, conType connectionType) connection {
-	ctx := context.Background()
-	return connection{
-		context:        ctx,
-		connectionType: &conType,
-		restClient:     client,
-	}
-}
-
 // createRealtimeClient creates a new realtime client and stores it in a connection.
 // A clientID is also set on the client.
 func createRealtimeClient(id connectionID) error {
@@ -120,28 +41,9 @@ func createRealtimeClient(id connectionID) error {
 		newClient = client
 	}
 
-	connection := newConnection(newClient, realtime)
+	connection := newRealtimeConnection(newClient, realtime)
 	connections[id] = &connection
 	log.Println(createRealtimeClientSuccess)
-
-	return nil
-}
-
-// createRestClient creates a new rest client and stores it in a connection.
-// A clientID is also set on the client.
-func createRestClient(id connectionID) error {
-
-	newClient, err := ably.NewREST(
-		ably.WithKey(config.Cfg.Key),
-		ably.WithClientID(id.string()),
-	)
-	if err != nil {
-		return err
-	}
-
-	connection := newRestConnection(newClient, rest)
-	connections[id] = &connection
-	log.Println(createRestClientSuccess)
 
 	return nil
 }
@@ -149,8 +51,8 @@ func createRestClient(id connectionID) error {
 // closeRealtimeClient closes an existing realtime client and removes the connection.
 func closeRealtimeClient(id connectionID) {
 
-	if connections[id] != nil && connections[id].client != nil {
-		connections[id].client.Close()
+	if connections[id] != nil && connections[id].realtimeClient != nil {
+		connections[id].realtimeClient.Close()
 
 		//Tear down the connection in internal memory.
 		connections[id].unsubscribe = nil
@@ -160,24 +62,11 @@ func closeRealtimeClient(id connectionID) {
 	}
 }
 
-// closeRestClient closes an existing realtime client and removes the connection.
-func closeRestClient(id connectionID) {
-
-	if connections[id] != nil && connections[id].restClient != nil {
-
-		//Tear down the connection in internal memory.
-		connections[id].restClient = nil
-		connections[id] = nil
-
-		log.Println(closeRestClientSuccess)
-	}
-}
-
-// setChannel sets the channel to the name provided in the channel name input text box.
-func setChannel(name string, id connectionID) {
-	newChannel := connections[id].client.Channels.Get(name)
-	connections[id].channel = newChannel
-	log.Println(setChannelSuccess)
+// realtimeSetChannel sets the channel to the name provided in the channel name input text box.
+func realtimeSetChannel(name string, id connectionID) {
+	newChannel := connections[id].realtimeClient.Channels.Get(name)
+	connections[id].realtimeChannel = newChannel
+	log.Println(setRealtimeChannelSuccess)
 }
 
 // detachChannel attaches a client to a channel.
@@ -186,7 +75,7 @@ func detachChannel(id connectionID) error {
 	ctx, cancel := context.WithTimeout(connections[id].context, defaultTimeout)
 	defer cancel()
 
-	if err := connections[id].channel.Detach(ctx); err != nil {
+	if err := connections[id].realtimeChannel.Detach(ctx); err != nil {
 		return err
 	}
 
@@ -200,7 +89,7 @@ func attachChannel(id connectionID) error {
 	ctx, cancel := context.WithTimeout(connections[id].context, defaultTimeout)
 	defer cancel()
 
-	if err := connections[id].channel.Attach(ctx); err != nil {
+	if err := connections[id].realtimeChannel.Attach(ctx); err != nil {
 		return err
 	}
 
@@ -208,12 +97,12 @@ func attachChannel(id connectionID) error {
 	return nil
 }
 
-// subscribeAll subscribes the connection's channel to all messsages.
+// realtimeSubscribeAll subscribes the connection's channel to all messsages.
 // once subscribe events are output to the eventInfo text box
-func subscribeAll(id connectionID, eventInfo *text.Text) (func(), error) {
+func realtimeSubscribeAll(id connectionID, eventInfo *text.Text) (func(), error) {
 
 	handlerFunc := newEventHandler(eventInfo)
-	unsubscribe, err := connections[id].channel.SubscribeAll(connections[id].context, handlerFunc)
+	unsubscribe, err := connections[id].realtimeChannel.SubscribeAll(connections[id].context, handlerFunc)
 
 	if err != nil {
 		return nil, err
@@ -244,14 +133,14 @@ func unsubscribe(id connectionID) {
 
 }
 
-// publishToChannel publishes message name and message data to a channel.
-func publishToChannel(id connectionID, messageName string, messageData interface{}) error {
+// publishToRealtimeChannel publishes message name and message data to a realtime channel.
+func publishToRealtimeChannel(id connectionID, messageName string, messageData interface{}) error {
 
 	// Set timeout to be default timeout
 	ctx, cancel := context.WithTimeout(connections[id].context, defaultTimeout)
 	defer cancel()
 
-	if err := connections[id].channel.Publish(ctx, messageName, messageData); err != nil {
+	if err := connections[id].realtimeChannel.Publish(ctx, messageName, messageData); err != nil {
 		return err
 	}
 
@@ -265,7 +154,7 @@ func enterPresence(id connectionID) error {
 	ctx, cancel := context.WithTimeout(connections[id].context, defaultTimeout)
 	defer cancel()
 
-	if err := connections[id].channel.Presence.Enter(ctx, nil); err != nil {
+	if err := connections[id].realtimeChannel.Presence.Enter(ctx, nil); err != nil {
 		log.Println(err)
 		return err
 	}
@@ -284,7 +173,7 @@ func getPresence(id connectionID, presenceInfo *text.Text) {
 	ctx, cancel := context.WithTimeout(connections[id].context, defaultTimeout)
 	defer cancel()
 
-	presenceMessages, err := connections[id].channel.Presence.Get(ctx)
+	presenceMessages, err := connections[id].realtimeChannel.Presence.Get(ctx)
 	if err != nil {
 		log.Println(err)
 		return
@@ -311,7 +200,7 @@ func leavePresence(id connectionID) error {
 	ctx, cancel := context.WithTimeout(connections[id].context, defaultTimeout)
 	defer cancel()
 
-	err := connections[id].channel.Presence.Leave(ctx, nil)
+	err := connections[id].realtimeChannel.Presence.Leave(ctx, nil)
 	if err != nil {
 		log.Println(err)
 		return err
