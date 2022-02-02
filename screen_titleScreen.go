@@ -65,6 +65,6 @@ func updateTitleScreen() {
 
 	// Handle mouse click on realtime button
 	if ebiten.IsMouseButtonPressed(ebiten.MouseButtonLeft) && realtimeButton.IsMouseOver() {
-		state = realtimeScreen
+		state = clientScreen
 	}
 }

@@ -37,6 +37,11 @@ func (b *Button) SetBgColour(colour *color.NRGBA) {
 	b.Image.Fill(colour)
 }
 
+// GetText is used to get the text on a button.
+func (b *Button) GetText() string {
+	return b.text
+}
+
 // SetText is used to change the text on a button.
 func (b *Button) SetText(text string) {
 	b.text = text

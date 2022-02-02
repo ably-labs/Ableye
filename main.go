@@ -29,8 +29,8 @@ func NewGame() *Game {
 func handleClose() {
 	connectionIDs := []connectionID{clientA, clientB, clientC, clientD}
 	for _, id := range connectionIDs {
-		if connections[id] != nil && connections[id].client != nil {
-			connections[id].client.Close()
+		if connections[id] != nil && connections[id].realtimeClient != nil {
+			connections[id].realtimeClient.Close()
 		}
 	}
 }
@@ -47,7 +47,7 @@ func (g *Game) Update() error {
 	switch state {
 	case titleScreen:
 		updateTitleScreen()
-	case realtimeScreen:
+	case clientScreen:
 		updateRealtimeScreen()
 	}
 
@@ -66,7 +66,7 @@ func (g *Game) Draw(screen *ebiten.Image) {
 	switch state {
 	case titleScreen:
 		drawTitleScreen(screen)
-	case realtimeScreen:
+	case clientScreen:
 		drawRealtimeScreen(screen)
 	}
 }
