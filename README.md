@@ -22,7 +22,7 @@ Run the executable with `./Ableye`
 
 ## Exploring Ably Realtime
 
-A new client can be created by left mouse click on either `Realtime Client` or `Rest client`. Up to 4 clients can be created simultaneously.
+A new client can be created by left mouse clicking on either the `Realtime Client` or the `Rest client` buttons. Up to 4 clients can be created simultaneously.
 
 ### Realtime Client
 
@@ -36,7 +36,7 @@ Message name and message data can be input and published to the channel using th
 
 ### Rest Client
 
-The rest client support a smaller number of features than the realtime client.
+The rest client supports a smaller number of features than the realtime client.
 
 After creating a rest client, a channel can be set by inputting a channel name then left mouse clicking on the `Set Channel` button.
 
