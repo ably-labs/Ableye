@@ -17,29 +17,20 @@ func createRealtimeClient(id connectionID) error {
 
 	var newClient *ably.Realtime
 
-	if config.Cfg.DebugMode {
-		// Create a new client with debug logging turned on.
-		client, err := ably.NewRealtime(
-			ably.WithKey(config.Cfg.Key),
-			ably.WithClientID(id.string()),
-			ably.WithLogLevel(ably.LogDebug),
-		)
-		if err != nil {
-			return err
-		}
-		newClient = client
-
-	} else {
-		// Create a new client.
-		client, err := ably.NewRealtime(
-			ably.WithKey(config.Cfg.Key),
-			ably.WithClientID(id.string()),
-		)
-		if err != nil {
-			return err
-		}
-		newClient = client
+	options := []ably.ClientOption{
+		ably.WithKey(config.Cfg.Key),
+		ably.WithClientID(id.string()),
 	}
+
+	if config.Cfg.DebugMode {
+		options = append(options, ably.WithLogLevel(ably.LogDebug))
+	}
+
+	client, err := ably.NewRealtime(options...)
+	if err != nil {
+		return err
+	}
+	newClient = client
 
 	connection := newRealtimeConnection(newClient, realtime)
 	connections[id] = &connection
