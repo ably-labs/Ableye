@@ -2,9 +2,11 @@
 
 This is a demo project created by Rosie Hamilton using Go and Ably Realtime.
 
-Ableye is a visualisation tool which can be used to explore the ably-go SDK.
+Ableye is a visualisation tool which can be used to explore the ably-go SDK. 
 
 Similar to how Postman can be used to explore and test APIs, Ableye can be used to explore and test the ably-go SDK.
+
+[This blog post](https://ably.com/blog/ablyeye-how-we-visualized-an-ably-sdk-with-go-and-ebiten) explains why and how this project was created. 
 
 ## Setup 
 
