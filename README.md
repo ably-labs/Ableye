@@ -47,7 +47,3 @@ It is possibly to get the channel presence by clicking on the `Get` button.
 Message name and message data can be input and published to the channel using the `Publish` button.
 
 Please note that the rest client does not support entering and leaving a channel. The rest client also does not support subscribing to a channel.
-
-## Known issues
-
-* For a realtime client, the `Enter` button must sometimes be clicked twice for a client to be able to see their own presence in a channel. See https://github.com/ably/ably-go/issues/436
