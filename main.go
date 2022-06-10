@@ -48,7 +48,7 @@ func (g *Game) Update() error {
 	case titleScreen:
 		updateTitleScreen()
 	case clientScreen:
-		updateRealtimeScreen()
+		updateClientScreen()
 	}
 
 	return nil

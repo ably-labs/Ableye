@@ -34,6 +34,7 @@ const (
 	publishText              = "Publish"
 	detachText               = "Detach"
 	attachText               = "Attach"
+	getChannelStatusText     = "Get Status"
 	subscribeAllText         = "Subscribe All"
 	unsubscribeText          = "Unsubscribe"
 	enterPresenceText        = "Enter"
@@ -63,6 +64,7 @@ const (
 	unsubscribeSuccess          = "Successfully unsubscribed from channel messages."
 	enterPresenceSuccess        = "Successfully entered presence."
 	leavePresenceSuccess        = "Successfully removed presence."
+	successText                 = "Success."
 
 	// Async processes
 	startGetPresence    = "go routine started to get presence."

@@ -42,7 +42,9 @@ The rest client supports a smaller number of features than the realtime client.
 
 After creating a rest client, a channel can be set by inputting a channel name then left mouse clicking on the `Set Channel` button.
 
-It is possibly to get the channel presence by clicking on the `Get` button. 
+It is possible to get the status of the channel by clicking on the `Get Status` button. Channel status includes whether the channel is active or not, the total number of: connections, presence connections, presence members, presence subscribers, publishers and subscribers. This infomration is displayed in the info bar at the top of the screen.
+
+It is possible to get the channel presence by clicking on the `Get` button. 
 
 Message name and message data can be input and published to the channel using the `Publish` button.
 

@@ -63,6 +63,7 @@ type connection struct {
 	realtimeChannel *ably.RealtimeChannel
 	restChannel     *ably.RESTChannel
 	unsubscribe     *func()
+	channelDetails  *ably.ChannelDetails
 }
 
 // newRealtimeConnection is a contructor to create a new realtime connection.
