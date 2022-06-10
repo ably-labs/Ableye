@@ -43,11 +43,26 @@ func closeRestClient(id connectionID) {
 	}
 }
 
-// setRestChannel sets the rest channel to the name provided in the channel name input text box.
+// restSetChannel sets the rest channel to the name provided in the channel name input text box.
 func restSetChannel(name string, id connectionID) {
 	newChannel := connections[id].restClient.Channels.Get(name)
 	connections[id].restChannel = newChannel
 	log.Println(setRestChannelSuccess)
+}
+
+// restGetChannelStatus makes a request to get the channel status
+func restGetChannelStatus(id connectionID) error {
+	// Set timeout to be default timeout
+	ctx, cancel := context.WithTimeout(connections[id].context, defaultTimeout)
+	defer cancel()
+
+	channel := connections[id].restChannel
+	channelDetails, err := channel.Status(ctx)
+	if err != nil {
+		return err
+	}
+	fmt.Printf("%+v", channelDetails)
+	return nil
 }
 
 // publishToRestChannel publishes message name and message data to a realtime channel.

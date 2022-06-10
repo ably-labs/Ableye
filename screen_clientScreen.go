@@ -26,6 +26,7 @@ type connectionElements struct {
 	channelDetach        button.Button
 	channelAttach        button.Button
 	channelSubscribeAll  button.Button
+	getChannelStatus     button.Button
 	presenceInfo         text.Text
 	enterPresence        button.Button
 	getPresence          button.Button
@@ -71,6 +72,7 @@ func initialiseConnectionElements(elements *connectionElements, id connectionID,
 	elements.channelStatus = text.NewText("", colour.ZingyGreen, font.MplusSmallFont, 0, 0)
 	elements.channelDetach = button.NewButton(75, 30, detachText, 10, 20, colour.Black, font.MplusSmallFont, colour.ZingyGreen, 0, 0)
 	elements.channelAttach = button.NewButton(75, 30, attachText, 10, 20, colour.Black, font.MplusSmallFont, colour.ZingyGreen, 0, 0)
+	elements.getChannelStatus = button.NewButton(100, 30, getChannelStatusText, 10, 20, colour.Black, font.MplusSmallFont, colour.ZingyGreen, 0, 0)
 	elements.channelSubscribeAll = button.NewButton(115, 30, subscribeAllText, 10, 20, colour.Black, font.MplusSmallFont, colour.ZingyGreen, 0, 0)
 	elements.presenceInfo = text.NewText("", colour.ElectricCyan, font.MplusSmallFont, 0, 0)
 	elements.enterPresence = button.NewButton(65, 30, enterPresenceText, 12, 20, colour.Black, font.MplusSmallFont, colour.ElectricCyan, 0, 0)
@@ -231,6 +233,14 @@ func drawChannelInfo(screen *ebiten.Image, elements *connectionElements) {
 		elements.channelSubscribeAll.Draw(screen)
 	}
 
+	// GetChannelStatus is currently only applicable to the rest client.
+	if isRestClient(id) {
+		// draw a get channel status button.
+		elements.getChannelStatus.SetX(button.X + 230)
+		elements.getChannelStatus.SetY(button.Y + button.Height + 4)
+		elements.getChannelStatus.Draw(screen)
+	}
+
 	// Draw the presence window.
 	ebitenutil.DrawRect(screen, float64(button.X)+8, float64(button.Y)+float64(button.Height)+42, (screenWidth/2)-26, screenHeight/24, colour.ElectricCyan)
 	ebitenutil.DrawRect(screen, float64(button.X)+9, float64(button.Y)+float64(button.Height)+43, (screenWidth/2)-28, (screenHeight/24)-2, colour.Black)
@@ -312,8 +322,8 @@ func drawEventInfo(screen *ebiten.Image, clientLabel button.Button, eventInfo *t
 	eventInfo.Draw(screen)
 }
 
-// updateRealtimeScreen updates the realtime screen.
-func updateRealtimeScreen() {
+// updateClientScreen updates the realtime screen.
+func updateClientScreen() {
 	// If the Escape key is pressed, return to the title screen.
 	if inpututil.IsKeyJustPressed(ebiten.KeyEscape) {
 		state = titleScreen
@@ -341,6 +351,7 @@ func updateConnectionElements(elements *connectionElements) {
 	updateChannelDetachButton(&elements.channelDetach, elements.id)
 	updateChannelAttachButton(&elements.channelAttach, elements.id)
 	updateSubscribeChannelButton(&elements.channelSubscribeAll, &elements.eventInfo, elements.id)
+	updateGetChannelStatusButton(&elements.getChannelStatus, elements.id)
 
 	// Presence controls.
 	updateEnterPresenceButton(&elements.enterPresence, elements.id)
@@ -455,6 +466,29 @@ func updateSetChannelButton(button *button.Button, channelName string, id connec
 		if isRestClient(id) && connections[id].restChannel == nil {
 			restSetChannel(channelName, id)
 			infoBar.SetText(setRestChannelSuccess)
+		}
+	}
+}
+
+// updateGetChannelStatusButton contains the update logic for each get channel status button.
+func updateGetChannelStatusButton(button *button.Button, id connectionID) {
+	// Handle mouseover interaction with a set channel button.
+	if button.IsMouseOver() {
+		button.SetBgColour(colour.White)
+	} else {
+		button.SetBgColour(colour.ZingyGreen)
+	}
+
+	// Handle mouse click on set channel button.
+	if inpututil.IsMouseButtonJustReleased(ebiten.MouseButtonLeft) && button.IsMouseOver() {
+		// this button is currently only available to rest clients.
+		if isRestClient(id) && connections[id].restChannel != nil {
+			if err := restGetChannelStatus(id); err != nil {
+				infoBar.SetText(err.Error())
+				return
+			}
+
+			infoBar.SetText(getRestChannelStatusSuccess)
 		}
 	}
 }
