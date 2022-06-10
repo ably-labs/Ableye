@@ -488,7 +488,7 @@ func updateGetChannelStatusButton(button *button.Button, id connectionID) {
 				return
 			}
 
-			channelInfo := fmt.Sprintf("%s IsActive: %t, Connections: %d, PresenceConnections: %d, PresenceMembers: %d, presenceSubscribers: %d, Publishers: %d, Subscribers: %d",
+			channelInfo := fmt.Sprintf("%s IsActive: %t, Connections: %d, PresenceConnections: %d, PresenceMembers: %d, PresenceSubscribers: %d, Publishers: %d, Subscribers: %d",
 				successText,
 				connections[id].channelDetails.Status.IsActive,
 				connections[id].channelDetails.Status.Occupancy.Metrics.Connections,
