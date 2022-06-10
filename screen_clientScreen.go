@@ -488,7 +488,17 @@ func updateGetChannelStatusButton(button *button.Button, id connectionID) {
 				return
 			}
 
-			infoBar.SetText(getRestChannelStatusSuccess)
+			channelInfo := fmt.Sprintf("%s IsActive: %t, Connections: %d, PresenceConnections: %d, PresenceMembers: %d, presenceSubscribers: %d, Publishers: %d, Subscribers: %d",
+				successText,
+				connections[id].channelDetails.Status.IsActive,
+				connections[id].channelDetails.Status.Occupancy.Metrics.Connections,
+				connections[id].channelDetails.Status.Occupancy.Metrics.PresenceConnections,
+				connections[id].channelDetails.Status.Occupancy.Metrics.PresenceMembers,
+				connections[id].channelDetails.Status.Occupancy.Metrics.PresenceSubscribers,
+				connections[id].channelDetails.Status.Occupancy.Metrics.Publishers,
+				connections[id].channelDetails.Status.Occupancy.Metrics.Subscribers,
+			)
+			infoBar.SetText(channelInfo)
 		}
 	}
 }

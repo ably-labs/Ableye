@@ -57,7 +57,6 @@ const (
 	closeRestClientSuccess      = "Successfully closed a rest client."
 	setRealtimeChannelSuccess   = "Successfully set channel for realtime client."
 	setRestChannelSuccess       = "Successfully set channel for rest client."
-	getRestChannelStatusSuccess = "Successfully got channel status for rest client."
 	detachChannelSuccess        = "Successfully detached from channel."
 	attachChannelSuccess        = "Successfuly attached to channel."
 	publishSuccess              = "Successfully published to channel."
@@ -65,6 +64,7 @@ const (
 	unsubscribeSuccess          = "Successfully unsubscribed from channel messages."
 	enterPresenceSuccess        = "Successfully entered presence."
 	leavePresenceSuccess        = "Successfully removed presence."
+	successText                 = "Success."
 
 	// Async processes
 	startGetPresence    = "go routine started to get presence."

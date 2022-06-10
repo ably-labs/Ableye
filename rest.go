@@ -61,7 +61,8 @@ func restGetChannelStatus(id connectionID) error {
 	if err != nil {
 		return err
 	}
-	fmt.Printf("%+v", channelDetails)
+	log.Printf("received channel details: %+v", channelDetails)
+	connections[id].channelDetails = channelDetails
 	return nil
 }
 
